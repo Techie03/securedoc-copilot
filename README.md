@@ -4,6 +4,13 @@
 
 SecureDoc Copilot is a secure, multi-user, **NVIDIA NIM-powered** agentic RAG platform that searches, reasons, remembers, evaluates, and acts across private documents, code, and enterprise knowledge.
 
+## 🎥 Product Demonstration
+
+*(Click below to watch the SecureDoc Copilot in action!)*
+[![SecureDoc Copilot Demo](https://img.youtube.com/vi/YOUR_YOUTUBE_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_YOUTUBE_VIDEO_ID "SecureDoc Copilot Demo")
+
+> **Note:** Replace `YOUR_YOUTUBE_VIDEO_ID` with your actual video ID once recorded.
+
 ---
 
 ## ⚡ Architecture & Data Flow
@@ -151,6 +158,46 @@ Visit `http://localhost:3000` to access SecureDoc Copilot.
 ### Databases
 - **PostgreSQL**: Supabase, Neon, or RDS.
 - **Qdrant**: Qdrant Cloud (Free tier available).
+
+---
+
+## 🤝 Contributing
+
+We love open-source and welcome contributions from the community! Whether you're fixing a bug, improving the UI, or adding a new AI connector, here is how you can contribute:
+
+### Step-by-Step Guide for Contributors
+
+1. **Fork the Repository**
+   Click the "Fork" button at the top right of this page to create your own copy of the repository.
+
+2. **Clone your Fork locally**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/securedoc-copilot.git
+   cd securedoc-copilot
+   ```
+
+3. **Create a New Branch**
+   Always create a descriptive branch for your feature or bug fix:
+   ```bash
+   git checkout -b feature/amazing-new-feature
+   ```
+
+4. **Make Your Changes**
+   Write your code! Ensure you test both the backend FastAPI and the Next.js frontend if your change impacts both.
+
+5. **Commit Your Changes**
+   Follow standard conventional commits:
+   ```bash
+   git commit -m "feat: added new google drive integration"
+   ```
+
+6. **Push Your Branch**
+   ```bash
+   git push origin feature/amazing-new-feature
+   ```
+
+7. **Open a Pull Request (PR)**
+   Go back to the main `Techie03/securedoc-copilot` repository on GitHub. You'll see a green "Compare & pull request" button. Click it, describe your changes, and submit!
 
 ---
 
