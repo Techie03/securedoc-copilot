@@ -53,6 +53,34 @@ graph TD
 
 ---
 
+## 📖 Step-by-Step Project Explanation
+
+SecureDoc Copilot is not just another ChatGPT wrapper. It is a deeply integrated, state-of-the-art **Agentic Retrieval-Augmented Generation (RAG)** pipeline designed for enterprise security and complex reasoning. Here is exactly how it works under the hood:
+
+### Step 1: Secure Data Ingestion & Isolation
+When a user uploads a document (PDF, DOCX) or syncs a GitHub repository, the FastAPI backend immediately assigns a strict workspace ID. Data is never co-mingled. The document text is parsed and split into overlapping chunks to preserve semantic context.
+
+### Step 2: Intelligent Entity Extraction (GraphRAG)
+Before the data is even searchable, it is passed to **NVIDIA's Llama 3.1 70B** model which performs advanced entity extraction. It reads the text and pulls out structured relationships in the format of `(Subject) -> [Predicate] -> (Object)`. These "triples" are stored in PostgreSQL, creating a literal Knowledge Graph of your private data.
+
+### Step 3: Vectorization (Dense Search)
+Simultaneously, the text chunks are converted into mathematical vectors using **NVIDIA's nv-embedqa** model. These vectors are stored in the Qdrant Vector Database, allowing the system to understand the "semantic meaning" of sentences rather than just matching keywords.
+
+### Step 4: The Agentic Query Router
+When a user asks a question in the chat interface, the query doesn't go straight to a search database. Instead, an AI **Router Agent** analyzes the intent. If it's a simple greeting, it responds directly. If it requires data, it triggers the Retrieval node.
+
+### Step 5: Hybrid Reciprocal Rank Fusion (RRF)
+To find the absolute best answer, the system searches 3 different ways simultaneously:
+1. **Dense Vector Search:** Looks for conceptual matches in Qdrant.
+2. **Sparse Keyword Search:** Looks for exact word matches using BM25 in Postgres.
+3. **Graph Traversal:** Explores the Knowledge Graph relationships extracted in Step 2.
+The results from all three methods are mathematically fused and re-ranked using an **NVIDIA NIM Reranker** model.
+
+### Step 6: Evaluated Generation
+Finally, the top context is handed to the primary LLM to generate the final answer. However, before it is sent back to the user, an independent **Evaluator Agent** reviews the answer to ensure it is *Faithful* (no hallucinations) and *Relevant* (actually answers the question). If it passes, the user receives their highly-accurate response!
+
+---
+
 ## 🚀 Key Features
 
 | Feature Area | Description |
