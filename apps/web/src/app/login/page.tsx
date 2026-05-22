@@ -9,6 +9,9 @@ import { Shield, Mail, Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react'
 
 import { Suspense } from 'react';
 
+// Global set to track processed OAuth codes across mount/unmount cycles in React StrictMode
+const oauthProcessedCodes = new Set<string>();
+
 function LoginContent() {
   const { login, githubLogin, googleLogin } = useAuth();
   const searchParams = useSearchParams();
@@ -16,6 +19,7 @@ function LoginContent() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const processedRef = React.useRef(false);
 
   React.useEffect(() => {
     const code = searchParams.get('code');
@@ -32,7 +36,9 @@ function LoginContent() {
         console.error("Failed to parse OAuth state", e);
       }
     }
-    if (code) {
+    if (code && !processedRef.current && !oauthProcessedCodes.has(code)) {
+      processedRef.current = true;
+      oauthProcessedCodes.add(code);
       setLoading(true);
       if (provider === 'google') {
         const redirectUri = window.location.origin + '/login';

@@ -81,7 +81,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, pathname, loading]);
 
-  const login = async (data: any) => {
+  const logout = React.useCallback(() => {
+    localStorage.removeItem('securedoc_token');
+    localStorage.removeItem('securedoc_current_workspace_id');
+    setUser(null);
+    setToken(null);
+    setWorkspaces([]);
+    setCurrentWorkspace(null);
+    router.push('/login');
+  }, [router]);
+
+  const login = React.useCallback(async (data: any) => {
     setLoading(true);
     try {
       const tokenResp = await api.login(data);
@@ -108,9 +118,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout, router]);
 
-  const githubLogin = async (code: string, redirectUri?: string) => {
+  const githubLogin = React.useCallback(async (code: string, redirectUri?: string) => {
     setLoading(true);
     try {
       const tokenResp = await api.githubLogin(code, redirectUri);
@@ -137,9 +147,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout, router]);
 
-  const googleLogin = async (code: string, redirectUri: string) => {
+  const googleLogin = React.useCallback(async (code: string, redirectUri: string) => {
     setLoading(true);
     try {
       const tokenResp = await api.googleLogin(code, redirectUri);
@@ -166,9 +176,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout, router]);
 
-  const signup = async (data: any) => {
+  const signup = React.useCallback(async (data: any) => {
     setLoading(true);
     try {
       await api.signup(data);
@@ -196,24 +206,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [logout, router]);
 
-  const logout = () => {
-    localStorage.removeItem('securedoc_token');
-    localStorage.removeItem('securedoc_current_workspace_id');
-    setUser(null);
-    setToken(null);
-    setWorkspaces([]);
-    setCurrentWorkspace(null);
-    router.push('/login');
-  };
-
-  const selectWorkspace = (workspace: Workspace) => {
+  const selectWorkspace = React.useCallback((workspace: Workspace) => {
     setCurrentWorkspace(workspace);
     localStorage.setItem('securedoc_current_workspace_id', workspace.id);
-  };
+  }, []);
 
-  const createWorkspace = async (name: string) => {
+  const createWorkspace = React.useCallback(async (name: string) => {
     try {
       const newWs = await api.createWorkspace(name);
       setWorkspaces(prev => [...prev, newWs]);
@@ -223,9 +223,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to create workspace:', error);
       throw error;
     }
-  };
+  }, [selectWorkspace]);
 
-  const refreshWorkspaces = async () => {
+  const refreshWorkspaces = React.useCallback(async () => {
     try {
       const wsList = await api.listWorkspaces();
       setWorkspaces(wsList);
@@ -238,7 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Failed to refresh workspaces:', error);
     }
-  };
+  }, [currentWorkspace]);
 
   return (
     <AuthContext.Provider

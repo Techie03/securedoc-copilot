@@ -62,6 +62,65 @@ def health_check():
         "exclusive_ai_provider": "NVIDIA NIM"
     }
 
+@app.get("/api/diagnostics", tags=["Diagnostics"])
+async def diagnostics(db: Session = Depends(get_db)):
+    """
+    Check the status of database, Qdrant, Redis, and NVIDIA NIM connections.
+    """
+    report = {
+        "database": "unknown",
+        "qdrant": "unknown",
+        "redis": "unknown",
+        "nvidia_nim": "unknown"
+    }
+    
+    # Test Database
+    try:
+        from sqlalchemy import text
+        db.execute(text("SELECT 1"))
+        report["database"] = "connected"
+    except Exception as e:
+        report["database"] = f"error: {str(e)}"
+        
+    # Test Qdrant
+    try:
+        from qdrant_client import QdrantClient
+        q_client = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY)
+        q_client.get_collections()
+        report["qdrant"] = "connected"
+    except Exception as e:
+        report["qdrant"] = f"error: {str(e)}"
+        
+    # Test Redis
+    try:
+        import redis
+        r = redis.Redis.from_url(settings.REDIS_URL, socket_timeout=3)
+        r.ping()
+        report["redis"] = "connected"
+    except Exception as e:
+        report["redis"] = f"error: {str(e)}"
+        
+    # Test NVIDIA NIM
+    try:
+        if not settings.NVIDIA_API_KEY or settings.NVIDIA_API_KEY == "your_nvidia_api_key_here":
+            report["nvidia_nim"] = "error: NVIDIA_API_KEY not configured"
+        else:
+            client = NvidiaNIMClient()
+            chat_test = await client.chat(
+                messages=[{"role": "user", "content": "hello"}]
+            )
+            report["nvidia_nim"] = "connected"
+    except Exception as e:
+        report["nvidia_nim"] = f"error: {str(e)}"
+        
+    # Check if OAuth is configured
+    report["oauth"] = {
+        "github_configured": bool(settings.GITHUB_CLIENT_ID and settings.GITHUB_CLIENT_SECRET),
+        "google_configured": bool(settings.GOOGLE_CLIENT_ID and settings.GOOGLE_CLIENT_SECRET)
+    }
+    
+    return report
+
 @app.get("/test-nim", tags=["Diagnostics"])
 async def test_nim_connection():
     """
