@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import httpx
 import os
 from datetime import timedelta
+from app.config import settings
 from app.database import get_db
 from app.crud import crud
 from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin
@@ -56,8 +57,8 @@ async def github_login(login_data: GitHubOAuthLogin, db: Session = Depends(get_d
     """
     Authenticate user via GitHub OAuth.
     """
-    client_id = os.getenv("GITHUB_CLIENT_ID")
-    client_secret = os.getenv("GITHUB_CLIENT_SECRET")
+    client_id = settings.GITHUB_CLIENT_ID
+    client_secret = settings.GITHUB_CLIENT_SECRET
     
     if not client_id or not client_secret:
         raise HTTPException(status_code=500, detail="GitHub OAuth is not configured on the server.")
@@ -131,8 +132,8 @@ async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_d
     """
     Authenticate user via Google OAuth.
     """
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
-    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+    client_id = settings.GOOGLE_CLIENT_ID
+    client_secret = settings.GOOGLE_CLIENT_SECRET
     
     if not client_id or not client_secret:
         raise HTTPException(status_code=500, detail="Google OAuth is not configured on the server.")

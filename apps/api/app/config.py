@@ -30,6 +30,15 @@ class Settings(BaseSettings):
     # Redis Cache/Queue
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    # OAuth Configurations
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
+    # CORS Configurations
+    ALLOWED_ORIGINS: str = "*"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
