@@ -119,9 +119,33 @@ There are no fallbacks to OpenAI, Anthropic, or Gemini.
 | **Frontend** | Next.js 16 (App Router), React 19, Tailwind CSS v4, Framer Motion, Lucide Icons |
 | **Backend** | Python 3.10+, FastAPI, LangGraph, SQLAlchemy, Pydantic, httpx |
 | **AI/ML** | NVIDIA NIM API (Embeddings, Reranker, LLM Chat) |
-| **Vector DB** | Qdrant (Local Docker or Cloud) |
-| **Relational DB** | PostgreSQL (User data, Auth, Connectors, Graph Triples) |
-| **Auth** | Custom JWT implementation with Bcrypt hashing |
+| **Vector DB** | Qdrant (Cloud) |
+| **Relational DB** | PostgreSQL via Supabase |
+| **Auth** | Custom JWT implementation with Bcrypt hashing, **GitHub OAuth**, **Google OAuth** |
+| **Hosting** | Vercel (Frontend), Hugging Face Spaces (Backend Docker Container) |
+
+---
+
+## 🔄 CI/CD Pipeline (GitHub Actions)
+
+We use **GitHub Actions** to enforce continuous integration (CI) and verify code quality before it hits production. The workflow is defined in `.github/workflows/ci.yml`.
+
+### How it works:
+Whenever code is pushed to the `main` branch or a Pull Request is opened, GitHub Actions spins up an Ubuntu environment and automatically runs two parallel jobs:
+
+1. **Backend Tests (FastAPI)**:
+   - Sets up Python 3.10.
+   - Installs all dependencies from `apps/api/requirements.txt` using `pip`.
+   - Runs `pytest` to execute all unit and integration tests to ensure the API logic, database schemas, and AI models operate flawlessly.
+   - Any failing tests will block the deployment.
+
+2. **Frontend Build (Next.js)**:
+   - Sets up Node.js 20.
+   - Restores the `npm` cache to speed up the process.
+   - Installs all React dependencies via `npm ci` ensuring a clean, lockfile-based installation.
+   - Runs `npm run build` to verify the Next.js App Router complies, no TypeScript errors exist, and the project can be bundled for production.
+
+Only if **both** jobs succeed (the tests pass and the frontend builds perfectly) does the code advance. If successful, Vercel detects the change to the `main` branch and automatically pulls the new code, triggering the final production deployment!
 
 ---
 
@@ -171,20 +195,21 @@ Visit `http://localhost:3000` to access SecureDoc Copilot.
 
 ## 📦 Deployment
 
-### Frontend (Vercel)
-1. Push your code to GitHub.
-2. Import the `apps/web` directory in Vercel.
-3. Set `NEXT_PUBLIC_API_URL` to your production backend URL.
-4. Deploy.
+Our application is separated into a serverless frontend and a containerized backend.
 
-### Backend (Render / Railway)
-1. Connect your repo and point to `apps/api`.
-2. Provide all environment variables (`DATABASE_URL`, `QDRANT_URL`, `NVIDIA_API_KEY`, etc.).
-3. Set the start command to: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+### Frontend (Vercel)
+The Next.js web application is automatically deployed to **Vercel**. Vercel connects directly to the GitHub repository. Whenever a new commit is pushed to the `main` branch and passes the GitHub Actions CI pipeline, Vercel automatically creates a new production build and deploys it globally.
+- Environment variables like `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GITHUB_CLIENT_ID`, and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` are securely injected at build time.
+
+### Backend (Hugging Face Spaces)
+The FastAPI backend is containerized using **Docker** and hosted as a persistent container on **Hugging Face Spaces**.
+- The `Dockerfile` handles installing system dependencies, Python packages, and starting the `uvicorn` server on port `7860`.
+- All AI communication, database querying, and JWT authentication happen safely within this secure environment.
+- Environment variables like `DATABASE_URL` (Supabase), `QDRANT_URL`, `NVIDIA_API_KEY`, `GITHUB_CLIENT_SECRET`, and `GOOGLE_CLIENT_SECRET` are managed directly within Hugging Face Space's secure Secret manager.
 
 ### Databases
-- **PostgreSQL**: Supabase, Neon, or RDS.
-- **Qdrant**: Qdrant Cloud (Free tier available).
+- **PostgreSQL**: Hosted on **Supabase** (Serverless DB providing connection pooling).
+- **Qdrant**: Hosted on **Qdrant Cloud** (Managed vector database).
 
 ---
 
