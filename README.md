@@ -1,6 +1,6 @@
 # SecureDoc Copilot :  A Futuristic Next-Generation Agentic RAG Platform
 
-> **Search. Reason. Remember. Act — securely across private knowledge.**
+> **Search. Reason. Remember. Act securely across private knowledge.**
 
 SecureDoc Copilot is a secure, multi-user, **NVIDIA NIM-powered** agentic RAG platform that searches, reasons, remembers, evaluates, and acts across private documents, code, and enterprise knowledge.
 
