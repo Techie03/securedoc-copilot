@@ -202,11 +202,16 @@ function getHeaders(token?: string | null): HeadersInit {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
   
+  const defaultHeaders = getHeaders();
+  if (options.body instanceof FormData) {
+    delete (defaultHeaders as Record<string, string>)['Content-Type'];
+  }
+  
   try {
     const response = await fetch(url, {
       ...options,
       headers: {
-        ...getHeaders(),
+        ...defaultHeaders,
         ...(options.headers || {}),
       },
     });

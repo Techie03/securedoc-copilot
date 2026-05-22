@@ -112,7 +112,7 @@ export default function Header() {
                 <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-gray-950 via-slate-900 to-gray-800 bg-clip-text text-transparent dark:from-white dark:via-slate-100 dark:to-slate-300">
                   SecureDoc
                 </span>
-                <span className="ml-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400 hidden xs:inline">
+                <span className="ml-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
                   Copilot
                 </span>
               </div>
