@@ -7,7 +7,9 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { Shield, Mail, Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 
-export default function LoginPage() {
+import { Suspense } from 'react';
+
+function LoginContent() {
   const { login, githubLogin } = useAuth();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -190,5 +192,17 @@ export default function LoginPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
