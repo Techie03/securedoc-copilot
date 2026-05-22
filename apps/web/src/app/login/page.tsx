@@ -41,7 +41,8 @@ function LoginContent() {
           setLoading(false);
         });
       } else {
-        githubLogin(code).catch(err => {
+        const redirectUri = window.location.origin + '/login';
+        githubLogin(code, redirectUri).catch(err => {
           setError(err.detail || 'GitHub login failed.');
           setLoading(false);
         });

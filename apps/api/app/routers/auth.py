@@ -64,14 +64,18 @@ async def github_login(login_data: GitHubOAuthLogin, db: Session = Depends(get_d
 
     # 1. Exchange code for access token
     async with httpx.AsyncClient() as client:
+        token_payload = {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": login_data.code,
+        }
+        if login_data.redirect_uri:
+            token_payload["redirect_uri"] = login_data.redirect_uri
+
         token_response = await client.post(
             "https://github.com/login/oauth/access_token",
             headers={"Accept": "application/json"},
-            data={
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "code": login_data.code,
-            }
+            data=token_payload
         )
         token_data = token_response.json()
 

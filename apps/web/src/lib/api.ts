@@ -8,7 +8,16 @@ const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
-    return `${protocol}//${hostname}:8000/api`;
+    const port = window.location.port;
+    
+    // In local development, the frontend runs on port 3000 and the backend on 8000
+    if (port === '3000') {
+      return `${protocol}//${hostname}:8000/api`;
+    }
+    
+    // In production, we proxy requests to the backend via Nginx on the same port/origin
+    const portSuffix = port ? `:${port}` : '';
+    return `${protocol}//${hostname}${portSuffix}/api`;
   }
   return 'http://127.0.0.1:8000/api';
 };
@@ -242,10 +251,10 @@ export const api = {
     });
   },
   
-  async githubLogin(code: string): Promise<{ access_token: string }> {
+  async githubLogin(code: string, redirectUri?: string): Promise<{ access_token: string }> {
     return request<{ access_token: string }>('/auth/github', {
       method: 'POST',
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, redirect_uri: redirectUri }),
     });
   },
 

@@ -19,6 +19,7 @@ class UserLogin(BaseModel):
 
 class GitHubOAuthLogin(BaseModel):
     code: str
+    redirect_uri: Optional[str] = None
 
 class GoogleOAuthLogin(BaseModel):
     code: str

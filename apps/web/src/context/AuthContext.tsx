@@ -11,7 +11,7 @@ interface AuthContextType {
   currentWorkspace: Workspace | null;
   loading: boolean;
   login: (data: any) => Promise<void>;
-  githubLogin: (code: string) => Promise<void>;
+  githubLogin: (code: string, redirectUri?: string) => Promise<void>;
   googleLogin: (code: string, redirectUri: string) => Promise<void>;
   signup: (data: any) => Promise<void>;
   logout: () => void;
@@ -110,10 +110,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const githubLogin = async (code: string) => {
+  const githubLogin = async (code: string, redirectUri?: string) => {
     setLoading(true);
     try {
-      const tokenResp = await api.githubLogin(code);
+      const tokenResp = await api.githubLogin(code, redirectUri);
       localStorage.setItem('securedoc_token', tokenResp.access_token);
       setToken(tokenResp.access_token);
 
