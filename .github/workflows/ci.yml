@@ -1,5 +1,20 @@
 name: CI Pipeline
 
+# ==============================================================================
+# SECUREDOC COPILOT - CONTINUOUS INTEGRATION WORKFLOW
+# ==============================================================================
+# This workflow runs automatically on every push and pull request targeting the
+# 'main' branch. It validates the code quality and correctness of both the 
+# frontend (Next.js) and backend (FastAPI) applications.
+#
+# Process Overview:
+# 1. Trigger: Developer pushes code or submits a PR to 'main'.
+# 2. Parallel Jobs:
+#    a. backend-test: Sets up Python 3.10, installs API dependencies, and runs unit tests.
+#    b. frontend-build: Sets up Node.js 20, runs clean install, and builds the Next.js bundle.
+# 3. Completion: If both jobs pass, the PR can be safely merged.
+# ==============================================================================
+
 on:
   push:
     branches: [ "main" ]
@@ -7,17 +22,32 @@ on:
     branches: [ "main" ]
 
 jobs:
+  # ----------------------------------------------------------------------------
+  # JOB 1: Backend Integration & Automated Testing
+  # ----------------------------------------------------------------------------
+  # Verifies the FastAPI application by checking:
+  # - Python syntax and dependency compatibility
+  # - Database model mapping & integrity checks
+  # - API endpoint responsiveness and routing validation
+  # - RAG pipeline ingestion & search integration (via mocked/local test targets)
+  # ----------------------------------------------------------------------------
   backend-test:
-    name: Backend Tests (FastAPI)
+    name: Backend Tests (FastAPI - Python 3.10)
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v3
+    # Step 1: Check out the repository source code to the runner
+    - name: Checkout Codebase
+      uses: actions/checkout@v3
 
+    # Step 2: Provision a clean Python 3.10 runtime environment
     - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
         
+    # Step 3: Upgrade pip and install backend packages
+    # We install requirements.txt first, then explicitly ensure testing utilities are present.
     - name: Install dependencies
       run: |
         cd apps/api
@@ -25,17 +55,32 @@ jobs:
         pip install -r requirements.txt
         pip install pytest httpx
 
-    - name: Run Pytest
+    # Step 4: Run the test suite via Pytest
+    # This executes backend logic tests located in apps/api/app/tests and verification tests.
+    - name: Run Pytest Suite
       run: |
         cd apps/api
         pytest
 
+  # ----------------------------------------------------------------------------
+  # JOB 2: Frontend Compilation & Verification
+  # ----------------------------------------------------------------------------
+  # Verifies the Next.js application by checking:
+  # - npm package integrity via lockfile compliance
+  # - TypeScript compilation (checks for type safety violations)
+  # - Production bundling (ensures Next.js code splits and tree-shakes properly)
+  # ----------------------------------------------------------------------------
   frontend-build:
-    name: Frontend Build (Next.js)
+    name: Frontend Build (Next.js - Node 20)
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v3
+    # Step 1: Check out the repository source code to the runner
+    - name: Checkout Codebase
+      uses: actions/checkout@v3
 
+    # Step 2: Provision Node.js 20 environment and configure npm caching
+    # Caching npm dependencies significantly speeds up subsequent build runs.
     - name: Set up Node.js 20
       uses: actions/setup-node@v3
       with:
@@ -43,12 +88,17 @@ jobs:
         cache: 'npm'
         cache-dependency-path: apps/web/package-lock.json
 
-    - name: Install dependencies
+    # Step 3: Perform clean, reproducible dependency installation
+    # Using 'npm ci' ensures that package-lock.json is strictly enforced.
+    - name: Install Frontend Dependencies
       run: |
         cd apps/web
         npm ci
 
-    - name: Lint and Build
+    # Step 4: Validate and Compile Next.js Web App
+    # This runs eslint rules and compiles the app. A single error halts the process.
+    - name: Lint and Build Web Application
       run: |
         cd apps/web
         npm run build
+

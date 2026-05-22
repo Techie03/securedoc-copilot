@@ -224,7 +224,7 @@ export default function Header() {
               </motion.a>
 
               <motion.a
-                href="https://github.com/Techie03/securedoc-copilot"
+                href="https://github.com/Techie03/securedoc-copilot/fork"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -2 }}

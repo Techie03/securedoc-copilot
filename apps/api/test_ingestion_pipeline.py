@@ -52,6 +52,8 @@ async def run_pipeline_test():
             print(f"Using test workspace: {test_ws.name}")
 
         # Clean up any leftover Qdrant vectors for this test workspace
+        print(f"   Ensuring Qdrant collection exists...")
+        qdrant_helper.ensure_collection()
         print(f"   Cleaning up previous vectors for workspace: {test_ws.id}")
         qdrant_helper.delete_by_workspace(str(test_ws.id))
 

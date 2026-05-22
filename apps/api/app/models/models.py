@@ -80,6 +80,7 @@ class Document(Base):
     # Relationships
     workspace = relationship("Workspace", back_populates="documents")
     chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")
+    knowledge_triples = relationship("KnowledgeGraphTriple", back_populates="document", cascade="all, delete-orphan")
 
 
 class DocumentChunk(Base):
@@ -292,4 +293,4 @@ class KnowledgeGraphTriple(Base):
 
     # Relationships
     workspace = relationship("Workspace", back_populates="knowledge_triples")
-    document = relationship("Document")
+    document = relationship("Document", back_populates="knowledge_triples")

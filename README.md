@@ -112,52 +112,107 @@ There are no fallbacks to OpenAI, Anthropic, or Gemini.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Detailed Technology Stack
 
-| Layer | Technologies |
-|---|---|
-| **Frontend** | Next.js 16 (App Router), React 19, Tailwind CSS v4, Framer Motion, Lucide Icons |
-| **Backend** | Python 3.10+, FastAPI, LangGraph, SQLAlchemy, Pydantic, httpx |
-| **AI/ML** | NVIDIA NIM API (Embeddings, Reranker, LLM Chat) |
-| **Vector DB** | Qdrant (Cloud) |
-| **Relational DB** | PostgreSQL via Supabase |
-| **Auth** | Custom JWT implementation with Bcrypt hashing, **GitHub OAuth**, **Google OAuth** |
-| **Hosting** | Vercel (Frontend), Hugging Face Spaces (Backend Docker Container) |
+Our stack is carefully curated to balance ultra-modern, high-performance web tooling with secure, robust enterprise-ready databases and AI orchestrators.
+
+| Layer | Component | Version | Role & Selection Rationale |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | **Next.js** | `16.2.6` | App Router for unified SSR/ISR/Client rendering, server components, and directory-based routes. |
+| | **React** | `19.2.4` | Modern functional UI components utilizing concurrent features and advanced hooks. |
+| | **Tailwind CSS** | `v4.0.0` | CSS-first configuration engine delivering sub-millisecond utility compiles and native CSS variable integration. |
+| | **Framer Motion** | `^12.40.0` | Physics-based animations and layout transitions for micro-interactions. |
+| | **Lucide Icons** | `^1.16.0` | Clean, customizable SVG icons designed for modern user interfaces. |
+| **Backend** | **FastAPI** | `0.100.0+` | High-performance asynchronous API layer with automatic OpenAPI Swagger generation. |
+| | **LangGraph** | `0.0.20+` | Advanced agentic state-machine orchestration with cycle management and conversational persistence. |
+| | **SQLAlchemy** | `2.0.0+` | Modern Python SQL toolkit and ORM with strict type mapping and optimized relation loading. |
+| | **Pydantic** | `2.0.0+` | Ultra-fast data validation and serialization based on Python type hints. |
+| **Databases** | **PostgreSQL** | `15+` | Relational state management, vector embeddings metadata, and full-text sparse (BM25) search. |
+| | **Qdrant** | `1.3.0+` | Scalable production-grade Vector DB for dense embedding indexing and cosine similarity filters. |
+| | **Redis** | `4.6.0+` | Distributed session locking, ephemeral key storage, and rate-limiting. |
+| **Security** | **PyJWT** | `3.3.0+` | JSON Web Token (JWT) encoding and decoding middleware with SHA256 signatures. |
+| | **Bcrypt** | `4.0.0+` | Cryptographic password hashing to safeguard account credentials in the database. |
+| **Inference** | **NVIDIA NIM** | *Latest* | High-throughput GPU inference microservices hosting Llama 3.1, nv-embedqa, and reranking APIs. |
+| **Hosting** | **Vercel** | *Managed* | Serverless global CDN delivery and continuous deployment for the Next.js frontend. |
+| | **Hugging Face** | *Container* | Spaces hosting the FastAPI container securely under an isolated runtime environment. |
 
 ---
 
 ## 🔄 CI/CD Pipeline (GitHub Actions)
 
-We use **GitHub Actions** to enforce continuous integration (CI) and verify code quality before it hits production. The workflow is defined in `.github/workflows/ci.yml`.
+We use **GitHub Actions** to enforce strict continuous integration (CI) gates, preventing faulty code, compile errors, or breaking database schemas from reaching the live application. The workflow is automatically triggered on every **Push** and **Pull Request** targeting the `main` branch, running on the configuration defined in [ci.yml](file:///.github/workflows/ci.yml).
 
-### How it works:
-Whenever code is pushed to the `main` branch or a Pull Request is opened, GitHub Actions spins up an Ubuntu environment and automatically runs two parallel jobs:
+### Execution Flow & Architecture
 
-1. **Backend Tests (FastAPI)**:
-   - Sets up Python 3.10.
-   - Installs all dependencies from `apps/api/requirements.txt` using `pip`.
-   - Runs `pytest` to execute all unit and integration tests to ensure the API logic, database schemas, and AI models operate flawlessly.
-   - Any failing tests will block the deployment.
+```mermaid
+graph TD
+    Trigger([Push / PR to main]) --> |Triggers Workflow| Runner[GitHub Runner: Ubuntu Latest]
+    
+    subgraph Parallel Job Execution
+        Runner --> Job1[Job 1: Backend Tests]
+        Runner --> Job2[Job 2: Frontend Build]
+        
+        subgraph Job 1 Process
+            Job1 --> B1[Checkout Code]
+            Job1 --> B2[Set up Python 3.10]
+            Job1 --> B3[Restore pip Cache]
+            Job1 --> B4[Install requirements.txt]
+            Job1 --> B5[Run pytest Suite]
+        end
+        
+        subgraph Job 2 Process
+            Job2 --> F1[Checkout Code]
+            Job2 --> F2[Set up Node.js 20]
+            Job2 --> F3[Restore npm Cache]
+            Job2 --> F4[Clean Install 'npm ci']
+            Job2 --> F5[Compile 'npm run build']
+        end
+    end
+    
+    B5 --> |Passes| Gate{Status Check Gate}
+    F5 --> |Passes| Gate
+    
+    Gate --> |All green| Merge[Merge Allowed / Deploy Active]
+    Gate --> |Any fail| Block[Merge Blocked / Dev Notified]
+```
 
-2. **Frontend Build (Next.js)**:
-   - Sets up Node.js 20.
-   - Restores the `npm` cache to speed up the process.
-   - Installs all React dependencies via `npm ci` ensuring a clean, lockfile-based installation.
-   - Runs `npm run build` to verify the Next.js App Router complies, no TypeScript errors exist, and the project can be bundled for production.
+### Detailed Job Explanations
 
-Only if **both** jobs succeed (the tests pass and the frontend builds perfectly) does the code advance. If successful, Vercel detects the change to the `main` branch and automatically pulls the new code, triggering the final production deployment!
+#### 1. Backend Verification (`backend-test` job)
+* **Environment**: `ubuntu-latest` running a clean Python 3.10 virtual environment.
+* **Dependencies**: Installs core frameworks from `apps/api/requirements.txt` along with testing utilities (`pytest` and `httpx`).
+* **Checks**:
+  * Runs python syntax audits and verifies structural typing.
+  * Launches `pytest` to execute all integration tests, validating model schemas, token encryption, and router configurations.
+  * **Failure Criteria**: If a database foreign key constraint fails, or a NIM API wrapper responds incorrectly, the pipeline immediately halts and blocks the PR from merging.
+
+#### 2. Frontend Verification (`frontend-build` job)
+* **Environment**: `ubuntu-latest` running Node.js 20.
+* **Dependencies**: Leverages GitHub Actions dependency caching based on `apps/web/package-lock.json` to prevent repeating expensive package downloads. It then runs `npm ci` for a deterministic, clean-room install.
+* **Checks**:
+  * Compiles the React codebase using the Next.js compiler `next build`.
+  * Enforces ESLint guidelines for code formatting and accessibility correctness.
+  * Validates complete TypeScript compilation (ensures there are no type mismatches or unsafe `any` casts).
+  * **Failure Criteria**: If a React component has invalid typescript props or fails to build as a production bundle, the build job aborts.
+
+#### 3. Automated Continuous Deployment (CD)
+* **Frontend**: Once the GitHub Action status check turns green, Vercel picks up the new commit, builds it, and pushes it live to the production domain.
+* **Backend**: Hugging Face Spaces rebuilds the backend Docker image using the updated commits from `main`, starting the new uvicorn service container on port `7860`.
 
 ---
 
 ## 💻 Quick Start Guide
 
-### 1. Prerequisites
-- Docker & Docker Compose
-- Node.js 18+
-- Python 3.10+
-- [NVIDIA API Key](https://build.nvidia.com/explore/discover)
+Follow these steps to run the entire stack locally with Docker Compose and hot-reloading development environments.
 
-### 2. Environment Setup
+### 1. Prerequisites
+- **Docker & Docker Compose** (version 2.20.0+ recommended)
+- **Node.js** (version 18+ or 20+)
+- **Python** (version 3.10+)
+- An active [NVIDIA API Key](https://build.nvidia.com/explore/discover)
+
+### 2. Environment Configuration
+Clone the repository, create a local environment file, and add your API tokens:
 ```bash
 # Clone the repository
 git clone https://github.com/Techie03/securedoc-copilot.git
@@ -165,93 +220,152 @@ cd securedoc-copilot
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env and add your NVIDIA_API_KEY
+# Open .env in your text editor and specify your NVIDIA_API_KEY
 ```
 
-### 3. Start Infrastructure (PostgreSQL & Qdrant)
+### 3. Spin Up Infrastructure Services
+Start the database and vector storage containers in detached mode:
 ```bash
 docker compose up -d
 ```
+This spawns:
+- **PostgreSQL** on `localhost:5432` (Relational DB)
+- **Qdrant Vector DB** on `localhost:6333` (Vector DB)
+- **Redis** on `localhost:6379` (Caching & Memory)
 
-### 4. Run Backend (FastAPI)
+### 4. Launch Backend Development Server
+Set up a Python virtual environment and run the FastAPI server:
 ```bash
 cd apps/api
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Activate the virtual environment
+# On Linux/macOS:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Install requirements & run
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
+Your backend will be available at `http://localhost:8000` (with documentation at `http://localhost:8000/docs`).
 
-### 5. Run Frontend (Next.js)
+### 5. Launch Frontend Development Server
+Install npm packages and start the Next.js development server:
 ```bash
 cd apps/web
 npm install
 npm run dev
 ```
-
-Visit `http://localhost:3000` to access SecureDoc Copilot.
+Visit `http://localhost:3000` in your web browser to access the frontend dashboard!
 
 ---
 
-## 📦 Deployment
-
-Our application is separated into a serverless frontend and a containerized backend.
+## 📦 Deployment Configs
 
 ### Frontend (Vercel)
-The Next.js web application is automatically deployed to **Vercel**. Vercel connects directly to the GitHub repository. Whenever a new commit is pushed to the `main` branch and passes the GitHub Actions CI pipeline, Vercel automatically creates a new production build and deploys it globally.
-- Environment variables like `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_GITHUB_CLIENT_ID`, and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` are securely injected at build time.
+Deploys dynamically via Vercel integration:
+- Environment variables: `NEXT_PUBLIC_API_URL` (pointing to the backend), `NEXT_PUBLIC_GITHUB_CLIENT_ID`, and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` are configured in the Vercel Project Dashboard.
 
 ### Backend (Hugging Face Spaces)
-The FastAPI backend is containerized using **Docker** and hosted as a persistent container on **Hugging Face Spaces**.
-- The `Dockerfile` handles installing system dependencies, Python packages, and starting the `uvicorn` server on port `7860`.
-- All AI communication, database querying, and JWT authentication happen safely within this secure environment.
-- Environment variables like `DATABASE_URL` (Supabase), `QDRANT_URL`, `NVIDIA_API_KEY`, `GITHUB_CLIENT_SECRET`, and `GOOGLE_CLIENT_SECRET` are managed directly within Hugging Face Space's secure Secret manager.
-
-### Databases
-- **PostgreSQL**: Hosted on **Supabase** (Serverless DB providing connection pooling).
-- **Qdrant**: Hosted on **Qdrant Cloud** (Managed vector database).
+The API runs inside a Docker container defined in [Dockerfile](file:///apps/api/Dockerfile).
+- Container Port: Hugging Face routes incoming traffic to port `7860`. The container starts uvicorn on port `7860`.
+- All credentials (`DATABASE_URL`, `QDRANT_URL`, `NVIDIA_API_KEY`, etc.) are injected securely by the Hugging Face secret engine as system environment variables.
 
 ---
 
-## 🤝 Contributing
+## 🤝 Open Source Contribution Guide
 
-We love open-source and welcome contributions from the community! Whether you're fixing a bug, improving the UI, or adding a new AI connector, here is how you can contribute:
+We love open-source and welcome contributions from the community! To ensure high-quality code and prevent regressions, please follow these step-by-step contribution guidelines:
 
-### Step-by-Step Guide for Contributors
+### Contribution Lifecycle
 
-1. **Fork the Repository**
-   Click the "Fork" button at the top right of this page to create your own copy of the repository.
+```mermaid
+sequenceDiagram
+    participant Developer as Contributor
+    participant Fork as Contributor Fork
+    participant Upstream as Main Repo (Techie03/securedoc-copilot)
+    participant CI as GitHub Actions CI
+    
+    Developer->>Upstream: 1. Fork Repository
+    Upstream-->>Fork: Creates Fork copy
+    Developer->>Fork: 2. Clone Fork Locally
+    Developer->>Developer: 3. Make Changes & Run Tests
+    Developer->>Fork: 4. Push branch
+    Developer->>Upstream: 5. Open Pull Request (PR)
+    Upstream->>CI: 6. Trigger CI Pipeline Checks
+    Note over CI: Run pytest & Next.js Build
+    CI-->>Upstream: Status Reports (All Green!)
+    Upstream->>Upstream: 7. Maintainer Reviews & Merges PR
+```
 
-2. **Clone your Fork locally**
+### Detailed Walkthrough
+
+#### Step 1: Fork and Clone
+1. Navigate to [Techie03/securedoc-copilot](https://github.com/Techie03/securedoc-copilot).
+2. Click the **Fork** button in the top-right corner to create your own copy of the repository.
+3. Clone your personal fork to your local system:
    ```bash
-   git clone https://github.com/Techie03/securedoc-copilot.git
+   git clone https://github.com/YOUR_GITHUB_USERNAME/securedoc-copilot.git
    cd securedoc-copilot
    ```
-
-3. **Create a New Branch**
-   Always create a descriptive branch for your feature or bug fix:
+4. Set up the original repository as your `upstream` remote so you can stay in sync with latest changes:
    ```bash
-   git checkout -b feature/amazing-new-feature
+   git remote add upstream https://github.com/Techie03/securedoc-copilot.git
    ```
 
-4. **Make Your Changes**
-   Write your code! Ensure you test both the backend FastAPI and the Next.js frontend if your change impacts both.
+#### Step 2: Syncing with Main
+Always pull the latest changes from upstream before starting a new feature:
+```bash
+git checkout main
+git fetch upstream
+git merge upstream/main
+```
 
-5. **Commit Your Changes**
-   Follow standard conventional commits:
+#### Step 3: Branching & Development
+Create a descriptive feature or bugfix branch:
+```bash
+git checkout -b feature/amazing-new-feature
+```
+*Tip: Keep your commits atomic and write clear, concise commit messages following [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).*
+
+#### Step 4: Running Tests Locally
+Before pushing your code, you **must** run automated checks locally to guarantee the CI pipeline will pass:
+
+1. **Verify Backend Tests**:
    ```bash
-   git commit -m "feat: added new google drive integration"
+   cd apps/api
+   pytest
+   ```
+2. **Verify Frontend Compilation**:
+   ```bash
+   cd apps/web
+   npm run build
+   ```
+3. **Verify Local Integration Pipeline**:
+   Ensure your local docker containers are running, then test the document parsing, vector indexing, and graph extraction:
+   ```bash
+   cd apps/api
+   python test_ingestion_pipeline.py
    ```
 
-6. **Push Your Branch**
+#### Step 5: Submission & Review
+1. Push your branch to your GitHub fork:
    ```bash
    git push origin feature/amazing-new-feature
    ```
-
-7. **Open a Pull Request (PR)**
-   Go back to the main `Techie03/securedoc-copilot` repository on GitHub. You'll see a green "Compare & pull request" button. Click it, describe your changes, and submit!
+2. Go to the original [Techie03/securedoc-copilot](https://github.com/Techie03/securedoc-copilot) repository.
+3. Click the **Compare & pull request** button.
+4. Provide a clear summary explaining:
+   - What changes were made.
+   - Any visual adjustments (include screenshots or GIFs if appropriate).
+   - Confirming that all local tests passed.
+5. Submit the PR. A maintainer will review your code and merge it once the CI checks complete successfully!
 
 ---
 
 ## 📄 License
-This project is licensed under the MIT License.
+
+This project is licensed under the terms of the MIT License. See [LICENSE](file:///LICENSE) for more details.
+

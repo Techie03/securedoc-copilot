@@ -114,7 +114,7 @@ export default function Home() {
             <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-transform duration-300 hover:translate-x-0"></span>
           </Link>
           <a
-            href="https://github.com/Techie03/securedoc-copilot"
+            href="https://github.com/Techie03/securedoc-copilot/fork"
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-12 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white/50 px-6 font-semibold text-slate-700 backdrop-blur-sm hover:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10 transition-colors duration-200"
