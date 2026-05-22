@@ -33,3 +33,7 @@ docker-compose.override.yml
 .idea/
 .vscode/
 *.swp
+
+# Temp Hugging Face repository clone
+hf_repo_temp/
+

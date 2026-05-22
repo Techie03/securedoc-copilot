@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     # NVIDIA NIM Configurations
     NVIDIA_API_KEY: str
     NVIDIA_BASE_URL: str = "https://integrate.api.nvidia.com/v1"
-    NVIDIA_LLM_MODEL: str = "nvidia/llama-3.1-nemotron-70b-instruct"
+    NVIDIA_LLM_MODEL: str = "meta/llama-3.3-70b-instruct"
     NVIDIA_EMBEDDING_MODEL: str = "nvidia/nv-embedqa-e5-v5"
     NVIDIA_RERANK_MODEL: str = "nvidia/nv-rerankqa-mistral-4b-v3"
 
@@ -45,4 +45,12 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    def __init__(self, **values):
+        super().__init__(**values)
+        # Strip all string values to avoid trailing newlines or whitespace
+        for field_name, field_value in self.__dict__.items():
+            if isinstance(field_value, str):
+                setattr(self, field_name, field_value.strip())
+
 settings = Settings()
+

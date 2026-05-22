@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Activity, CheckCircle2, AlertTriangle, Globe, RefreshCw, Database, Server, Key, Terminal } from 'lucide-react';
 import Link from 'next/link';
+import { API_BASE_URL } from '@/lib/api';
 
 export default function DiagnosticsPage() {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function DiagnosticsPage() {
     if (typeof window !== 'undefined') {
       setClientOrigin(window.location.origin);
     }
-    setApiBaseUrl(process.env.NEXT_PUBLIC_API_URL || '(Default fallback: same origin / port 8000)');
+    setApiBaseUrl(API_BASE_URL);
     setGithubClientId(process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '(Not Configured)');
     setGoogleClientId(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '(Not Configured)');
   }, []);
@@ -30,18 +31,7 @@ export default function DiagnosticsPage() {
     setBackendDiagnostics({ status: 'Checking', detail: 'Sending request...' });
 
     // Determine target API URL
-    let baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-    if (!baseUrl && typeof window !== 'undefined') {
-      const port = window.location.port;
-      if (port === '3000') {
-        baseUrl = `${window.location.protocol}//${window.location.hostname}:8000/api`;
-      } else {
-        const portSuffix = port ? `:${port}` : '';
-        baseUrl = `${window.location.protocol}//${window.location.hostname}${portSuffix}/api`;
-      }
-    } else if (baseUrl && !baseUrl.endsWith('/api')) {
-      baseUrl = baseUrl + '/api';
-    }
+    const baseUrl = API_BASE_URL;
 
     const healthUrl = baseUrl.replace('/api', '') + '/health';
     const diagUrl = baseUrl + '/diagnostics';

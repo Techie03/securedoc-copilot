@@ -15,6 +15,11 @@ const getApiBaseUrl = () => {
       return `${protocol}//${hostname}:8000/api`;
     }
     
+    // Fallback for Vercel production hosting to point to Hugging Face space backend
+    if (hostname.includes('vercel.app')) {
+      return 'https://nishith374-securedoc-api.hf.space/api';
+    }
+    
     // In production, we proxy requests to the backend via Nginx on the same port/origin
     const portSuffix = port ? `:${port}` : '';
     return `${protocol}//${hostname}${portSuffix}/api`;
@@ -22,7 +27,7 @@ const getApiBaseUrl = () => {
   return 'http://127.0.0.1:8000/api';
 };
 
-const API_BASE_URL = getApiBaseUrl();
+export const API_BASE_URL = getApiBaseUrl();
 
 export interface User {
   id: string;

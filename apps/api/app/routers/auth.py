@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import httpx
-import os
-from datetime import timedelta
 from app.config import settings
 from app.database import get_db
 from app.crud import crud
@@ -79,9 +77,6 @@ async def github_login(login_data: GitHubOAuthLogin, db: Session = Depends(get_d
             data=token_payload
         )
         token_data = token_response.json()
-        print(f"GitHub OAuth Debug - Token Request Data: {token_payload}")
-        print(f"GitHub OAuth Debug - Token Response ({token_response.status_code}): {token_data}")
-
         if "error" in token_data:
             err_desc = token_data.get('error_description') or token_data.get('error')
             raise HTTPException(status_code=400, detail=f"GitHub OAuth error: {err_desc}")
@@ -155,9 +150,6 @@ async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_d
             data=token_payload
         )
         token_data = token_response.json()
-        print(f"Google OAuth Debug - Token Request Data: {token_payload}")
-        print(f"Google OAuth Debug - Token Response ({token_response.status_code}): {token_data}")
-
         if "error" in token_data:
             err_desc = token_data.get('error_description') or token_data.get('error')
             raise HTTPException(status_code=400, detail=f"Google OAuth error: {err_desc}")

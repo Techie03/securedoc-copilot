@@ -75,6 +75,44 @@ function LoginContent() {
     }
   };
 
+  const startGithubOAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+    if (!clientId) {
+      setError('GitHub OAuth client ID is not configured.');
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+    const redirectUri = window.location.origin + '/login';
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: 'user:email',
+    });
+    window.location.href = `https://github.com/login/oauth/authorize?${params.toString()}`;
+  };
+
+  const startGoogleOAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      setError('Google OAuth client ID is not configured.');
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+    const redirectUri = window.location.origin + '/login';
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'email profile',
+      state: JSON.stringify({ provider: 'google' }),
+    });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  };
+
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Cyberpunk Elements */}
@@ -196,11 +234,7 @@ function LoginContent() {
 
           <div className="mt-6">
             <button
-              onClick={() => {
-                const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '';
-                const redirectUri = window.location.origin + '/login';
-                window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email`;
-              }}
+              onClick={startGithubOAuth}
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-slate-700/50 hover:border-white/20 disabled:opacity-50 mb-3"
             >
@@ -211,13 +245,7 @@ function LoginContent() {
             </button>
 
             <button
-              onClick={() => {
-                const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
-                const redirectUri = window.location.origin + '/login';
-                // Using state to pass the provider because Google allows exact redirect URIs only
-                const state = encodeURIComponent(JSON.stringify({ provider: 'google' }));
-                window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&state=${state}`;
-              }}
+              onClick={startGoogleOAuth}
               disabled={loading}
               className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-slate-800/50 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-slate-700/50 hover:border-white/20 disabled:opacity-50"
             >
