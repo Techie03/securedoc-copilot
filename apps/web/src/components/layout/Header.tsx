@@ -212,7 +212,7 @@ export default function Header() {
             {/* GitHub Action Buttons (Desktop only) */}
             <nav className="hidden lg:flex items-center gap-3">
               <motion.a
-                href="https://github.com"
+                href="https://github.com/Techie03/securedoc-copilot"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -2 }}
@@ -224,7 +224,7 @@ export default function Header() {
               </motion.a>
 
               <motion.a
-                href="https://github.com"
+                href="https://github.com/Techie03/securedoc-copilot"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ y: -2 }}

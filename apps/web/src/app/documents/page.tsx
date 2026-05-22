@@ -227,7 +227,7 @@ export default function DocumentLibrary() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Fork/View codebase block as requested */}
             <a 
-              href="https://github.com" 
+              href="https://github.com/Techie03/securedoc-copilot" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/40 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-900/80 transition-all duration-300"

@@ -136,7 +136,7 @@ There are no fallbacks to OpenAI, Anthropic, or Gemini.
 ### 2. Environment Setup
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/securedoc-copilot.git
+git clone https://github.com/Techie03/securedoc-copilot.git
 cd securedoc-copilot
 
 # Set up environment variables
@@ -199,7 +199,7 @@ We love open-source and welcome contributions from the community! Whether you're
 
 2. **Clone your Fork locally**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/securedoc-copilot.git
+   git clone https://github.com/Techie03/securedoc-copilot.git
    cd securedoc-copilot
    ```
 
