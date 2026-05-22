@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -18,17 +19,20 @@ import {
   Plus, 
   User as UserIcon,
   X,
-  Loader2
+  Loader2,
+  Menu
 } from 'lucide-react';
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { user, workspaces, currentWorkspace, selectWorkspace, createWorkspace, logout } = useAuth();
+  const pathname = usePathname();
   
   // Dropdown states
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -38,6 +42,14 @@ export default function Header() {
 
   const workspaceRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+
+  const navLinks = [
+    { name: 'Chat', href: '/chat' },
+    { name: 'Documents', href: '/documents' },
+    { name: 'Memory', href: '/memory' },
+    { name: 'Evaluations', href: '/evaluations' },
+    { name: 'Connectors', href: '/connectors' },
+  ];
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -85,8 +97,8 @@ export default function Header() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Left: Brand Logo & Title */}
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
               <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-600 to-cyan-500 p-[1.5px] shadow-lg shadow-violet-500/20 group-hover:shadow-cyan-500/30 transition-all duration-300">
                 <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-white dark:bg-slate-950 transition-colors duration-300">
                   <Shield className="h-5 w-5 text-violet-600 dark:text-cyan-400 group-hover:scale-110 transition-transform duration-300" />
@@ -96,11 +108,11 @@ export default function Header() {
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
                 </span>
               </div>
-              <div>
+              <div className="flex items-center">
                 <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-gray-950 via-slate-900 to-gray-800 bg-clip-text text-transparent dark:from-white dark:via-slate-100 dark:to-slate-300">
                   SecureDoc
                 </span>
-                <span className="ml-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                <span className="ml-1 text-sm font-semibold text-cyan-600 dark:text-cyan-400 hidden xs:inline">
                   Copilot
                 </span>
               </div>
@@ -112,10 +124,10 @@ export default function Header() {
                 <motion.button
                   onClick={() => setShowWorkspaceMenu(!showWorkspaceMenu)}
                   whileHover={{ y: -1 }}
-                  className="flex items-center gap-2 rounded-xl border border-gray-200/60 bg-white/40 px-3.5 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-all duration-200 shadow-sm cursor-pointer"
+                  className="flex items-center gap-2 rounded-xl border border-gray-200/60 bg-white/40 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-all duration-200 shadow-sm cursor-pointer"
                 >
                   <FolderLock className="h-3.5 w-3.5 text-cyan-500" />
-                  <span className="max-w-[140px] truncate">
+                  <span className="max-w-[70px] sm:max-w-[130px] truncate">
                     {currentWorkspace ? currentWorkspace.name : 'Select Workspace'}
                   </span>
                   <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${showWorkspaceMenu ? 'rotate-180' : ''}`} />
@@ -168,46 +180,32 @@ export default function Header() {
                 </AnimatePresence>
               </div>
             )}
-
-            {/* Desktop Navigation Links */}
-            {mounted && user && currentWorkspace && (
-              <nav className="hidden md:flex items-center gap-5 ml-2 border-l border-gray-200/40 dark:border-white/10 pl-5">
-                <Link
-                  href="/chat"
-                  className="text-xs font-bold text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200"
-                >
-                  Chat
-                </Link>
-                <Link
-                  href="/documents"
-                  className="text-xs font-bold text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200"
-                >
-                  Documents
-                </Link>
-                <Link
-                  href="/memory"
-                  className="text-xs font-bold text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200"
-                >
-                  Memory
-                </Link>
-                <Link
-                  href="/evaluations"
-                  className="text-xs font-bold text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200"
-                >
-                  Evaluations
-                </Link>
-                <Link
-                  href="/connectors"
-                  className="text-xs font-bold text-gray-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors duration-200"
-                >
-                  Connectors
-                </Link>
-              </nav>
-            )}
           </div>
 
+          {/* Center: Desktop Navigation Links */}
+          {mounted && user && currentWorkspace && (
+            <nav className="hidden lg:flex items-center justify-center gap-1.5 px-1.5 py-1 rounded-2xl border border-gray-200/30 bg-gray-50/40 dark:border-white/5 dark:bg-white/5 backdrop-blur-sm shadow-inner">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 border ${
+                      isActive
+                        ? 'bg-white border-gray-200/60 text-cyan-600 dark:bg-slate-900 dark:border-white/10 dark:text-cyan-400 shadow-sm'
+                        : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+
           {/* Right: Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             
             {/* GitHub Action Buttons (Desktop only) */}
             <nav className="hidden lg:flex items-center gap-3">
@@ -217,10 +215,11 @@ export default function Header() {
                 rel="noopener noreferrer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white/50 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white/40 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 shadow-sm"
+                title="View Code"
               >
-                <Github className="h-3.5 w-3.5" />
-                <span>View Code</span>
+                <Github className="h-4 w-4" />
+                <span className="hidden xl:inline">View Code</span>
               </motion.a>
 
               <motion.a
@@ -229,10 +228,11 @@ export default function Header() {
                 rel="noopener noreferrer"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white/50 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200"
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white/40 hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors duration-200 shadow-sm"
+                title="Fork Repo"
               >
                 <GitFork className="h-3.5 w-3.5" />
-                <span>Fork Repo</span>
+                <span className="hidden xl:inline">Fork Repo</span>
               </motion.a>
             </nav>
 
@@ -351,9 +351,87 @@ export default function Header() {
               </AnimatePresence>
             </motion.button>
 
+            {/* Mobile Menu Button (Hamburger) */}
+            {mounted && user && (
+              <motion.button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex lg:hidden h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white/50 hover:bg-gray-50 shadow-sm dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                aria-label="Toggle Menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5 text-gray-650 dark:text-slate-300" />
+                ) : (
+                  <Menu className="h-5 w-5 text-gray-650 dark:text-slate-300" />
+                )}
+              </motion.button>
+            )}
+
           </div>
         </div>
       </header>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="lg:hidden border-b border-gray-200/40 bg-white/95 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/95 overflow-hidden"
+          >
+            <div className="space-y-4 px-4 py-6">
+              {/* Navigation Links */}
+              <nav className="flex flex-col gap-1.5">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all border ${
+                        isActive
+                          ? 'bg-cyan-50 border-cyan-200/60 text-cyan-600 dark:bg-cyan-500/10 dark:border-cyan-500/20 dark:text-cyan-400'
+                          : 'border-transparent text-gray-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <span>{link.name}</span>
+                      <ChevronDown className="h-4 w-4 -rotate-90 text-slate-400" />
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              <div className="border-t border-gray-200/40 dark:border-white/10 my-4" />
+
+              {/* GitHub buttons (Mobile view) */}
+              <div className="grid grid-cols-2 gap-3">
+                <a
+                  href="https://github.com/Techie03/securedoc-copilot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+                >
+                  <Github className="h-4 w-4" />
+                  <span>View Code</span>
+                </a>
+                <a
+                  href="https://github.com/Techie03/securedoc-copilot/fork"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-50 dark:border-white/10 dark:text-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+                >
+                  <GitFork className="h-4 w-4" />
+                  <span>Fork Repo</span>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Futuristic Neon Workspace Creation Modal */}
       <AnimatePresence>
@@ -441,4 +519,3 @@ export default function Header() {
     </>
   );
 }
-

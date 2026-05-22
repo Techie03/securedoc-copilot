@@ -215,7 +215,22 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       let errorMessage = 'An error occurred';
       try {
         const errorData = await response.json();
-        errorMessage = errorData.detail || errorMessage;
+        if (errorData && errorData.detail !== undefined) {
+          if (Array.isArray(errorData.detail)) {
+            errorMessage = errorData.detail
+              .map((err: any) => {
+                if (typeof err === 'object' && err !== null) {
+                  return err.msg || err.message || JSON.stringify(err);
+                }
+                return String(err);
+              })
+              .join(', ');
+          } else if (typeof errorData.detail === 'object' && errorData.detail !== null) {
+            errorMessage = errorData.detail.message || errorData.detail.msg || JSON.stringify(errorData.detail);
+          } else {
+            errorMessage = String(errorData.detail);
+          }
+        }
       } catch {
         errorMessage = response.statusText || errorMessage;
       }
