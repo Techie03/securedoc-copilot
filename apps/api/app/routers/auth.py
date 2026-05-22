@@ -5,7 +5,7 @@ import os
 from datetime import timedelta
 from app.database import get_db
 from app.crud import crud
-from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin
+from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin
 from app.utils.security import verify_password, create_access_token
 from app.dependencies import get_current_user
 from app.models.models import User
@@ -116,6 +116,66 @@ async def github_login(login_data: GitHubOAuthLogin, db: Session = Depends(get_d
         user = crud.create_user(db=db, user_in=user_in)
 
     # 5. Issue our own JWT
+    jwt_token = create_access_token(data={"sub": user.id, "email": user.email})
+    return {
+        "access_token": jwt_token,
+        "token_type": "bearer"
+    }
+
+@router.post("/google", response_model=Token)
+async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_db)):
+    """
+    Authenticate user via Google OAuth.
+    """
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+    
+    if not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="Google OAuth is not configured on the server.")
+
+    # 1. Exchange code for access token
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "code": login_data.code,
+                "grant_type": "authorization_code",
+                "redirect_uri": login_data.redirect_uri
+            }
+        )
+        token_data = token_response.json()
+
+        if "error" in token_data:
+            raise HTTPException(status_code=400, detail=f"Google OAuth error: {token_data.get('error_description')}")
+
+        access_token = token_data.get("access_token")
+        if not access_token:
+            raise HTTPException(status_code=400, detail="Failed to retrieve access token from Google.")
+
+        # 2. Fetch user profile from Google
+        user_response = await client.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        user_data = user_response.json()
+        
+        email = user_data.get("email")
+
+        if not email:
+            raise HTTPException(status_code=400, detail="Failed to retrieve an email address from Google.")
+
+    # 3. Find or create user
+    user = crud.get_user_by_email(db, email=email)
+    if not user:
+        # Create a new user with a dummy password since they are using SSO
+        import secrets
+        dummy_password = secrets.token_urlsafe(32)
+        user_in = UserCreate(email=email, password=dummy_password, full_name=user_data.get("name", "Google User"))
+        user = crud.create_user(db=db, user_in=user_in)
+
+    # 4. Issue our own JWT
     jwt_token = create_access_token(data={"sub": user.id, "email": user.email})
     return {
         "access_token": jwt_token,

@@ -234,6 +234,13 @@ export const api = {
     });
   },
 
+  async googleLogin(code: string, redirectUri: string): Promise<{ access_token: string }> {
+    return request<{ access_token: string }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ code, redirect_uri: redirectUri }),
+    });
+  },
+
   async getMe(token?: string): Promise<User> {
     return request<User>('/auth/me', {
       method: 'GET',

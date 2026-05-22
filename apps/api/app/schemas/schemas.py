@@ -20,6 +20,10 @@ class UserLogin(BaseModel):
 class GitHubOAuthLogin(BaseModel):
     code: str
 
+class GoogleOAuthLogin(BaseModel):
+    code: str
+    redirect_uri: str
+
 class UserResponse(UserBase):
     id: str
     created_at: datetime

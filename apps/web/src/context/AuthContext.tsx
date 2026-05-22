@@ -12,6 +12,7 @@ interface AuthContextType {
   loading: boolean;
   login: (data: any) => Promise<void>;
   githubLogin: (code: string) => Promise<void>;
+  googleLogin: (code: string, redirectUri: string) => Promise<void>;
   signup: (data: any) => Promise<void>;
   logout: () => void;
   selectWorkspace: (workspace: Workspace) => void;
@@ -138,6 +139,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const googleLogin = async (code: string, redirectUri: string) => {
+    setLoading(true);
+    try {
+      const tokenResp = await api.googleLogin(code, redirectUri);
+      localStorage.setItem('securedoc_token', tokenResp.access_token);
+      setToken(tokenResp.access_token);
+
+      const userProfile = await api.getMe(tokenResp.access_token);
+      setUser(userProfile);
+
+      const wsList = await api.listWorkspaces();
+      setWorkspaces(wsList);
+
+      if (wsList.length > 0) {
+        setCurrentWorkspace(wsList[0]);
+        localStorage.setItem('securedoc_current_workspace_id', wsList[0].id);
+      } else {
+        setCurrentWorkspace(null);
+      }
+      
+      router.push('/dashboard');
+    } catch (error) {
+      logout();
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signup = async (data: any) => {
     setLoading(true);
     try {
@@ -220,6 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         login,
         githubLogin,
+        googleLogin,
         signup,
         logout,
         selectWorkspace,
