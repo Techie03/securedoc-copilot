@@ -79,9 +79,12 @@ async def github_login(login_data: GitHubOAuthLogin, db: Session = Depends(get_d
             data=token_payload
         )
         token_data = token_response.json()
+        print(f"GitHub OAuth Debug - Token Request Data: {token_payload}")
+        print(f"GitHub OAuth Debug - Token Response ({token_response.status_code}): {token_data}")
 
         if "error" in token_data:
-            raise HTTPException(status_code=400, detail=f"GitHub OAuth error: {token_data.get('error_description')}")
+            err_desc = token_data.get('error_description') or token_data.get('error')
+            raise HTTPException(status_code=400, detail=f"GitHub OAuth error: {err_desc}")
 
         access_token = token_data.get("access_token")
         if not access_token:
@@ -140,20 +143,24 @@ async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_d
 
     # 1. Exchange code for access token
     async with httpx.AsyncClient() as client:
+        token_payload = {
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": login_data.code,
+            "grant_type": "authorization_code",
+            "redirect_uri": login_data.redirect_uri
+        }
         token_response = await client.post(
             "https://oauth2.googleapis.com/token",
-            data={
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "code": login_data.code,
-                "grant_type": "authorization_code",
-                "redirect_uri": login_data.redirect_uri
-            }
+            data=token_payload
         )
         token_data = token_response.json()
+        print(f"Google OAuth Debug - Token Request Data: {token_payload}")
+        print(f"Google OAuth Debug - Token Response ({token_response.status_code}): {token_data}")
 
         if "error" in token_data:
-            raise HTTPException(status_code=400, detail=f"Google OAuth error: {token_data.get('error_description')}")
+            err_desc = token_data.get('error_description') or token_data.get('error')
+            raise HTTPException(status_code=400, detail=f"Google OAuth error: {err_desc}")
 
         access_token = token_data.get("access_token")
         if not access_token:

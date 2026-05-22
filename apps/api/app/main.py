@@ -22,9 +22,11 @@ app = FastAPI(
 import os
 
 # CORS configurations
-ALLOWED_ORIGINS = settings.ALLOWED_ORIGINS.split(",")
+ALLOWED_ORIGINS = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
+print(f"CORS Configurations: ALLOWED_ORIGINS={ALLOWED_ORIGINS}")
 
-if "*" in ALLOWED_ORIGINS:
+if "*" in ALLOWED_ORIGINS or not ALLOWED_ORIGINS:
+    print("CORS: Allowing all origins via regex pattern")
     app.add_middleware(
         CORSMiddleware,
         allow_origin_regex=r"https?://.*",
@@ -33,6 +35,7 @@ if "*" in ALLOWED_ORIGINS:
         allow_headers=["*"],
     )
 else:
+    print(f"CORS: Allowing specific origins: {ALLOWED_ORIGINS}")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ALLOWED_ORIGINS,
