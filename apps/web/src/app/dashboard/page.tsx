@@ -59,9 +59,9 @@ export default function Dashboard() {
 
   if (loading || !user) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-950 text-white min-h-[calc(100vh-4rem)]">
-        <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
-        <p className="mt-4 text-sm text-slate-400 font-medium">Loading secure session data...</p>
+      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 font-medium">Loading secure session data...</p>
       </div>
     );
   }
@@ -74,19 +74,23 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col">
+    <div className="relative min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col">
       {/* Subtle background glow */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-violet-600/5 rounded-full blur-3xl -z-10" />
 
       <div className="mx-auto max-w-7xl w-full flex-1 flex flex-col">
         {/* Welcome Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">{user.full_name}</span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-violet-600 dark:from-cyan-400 dark:to-violet-400">{user.full_name}</span>
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-1">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
               System status is healthy. All intelligence nodes running exclusively on NVIDIA NIM.
             </p>
           </div>
@@ -109,15 +113,15 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/40 p-5 backdrop-blur-md shadow-sm"
+                className="overflow-hidden rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-400">{stat.label}</span>
+                  <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</span>
                   <div className={`p-2 rounded-lg ${stat.color}`}>
                     <Icon className="h-5 w-5" />
                   </div>
                 </div>
-                <div className="mt-2 text-3xl font-bold text-white">{stat.value}</div>
+                <div className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">{stat.value}</div>
               </motion.div>
             );
           })}
@@ -131,7 +135,7 @@ export default function Dashboard() {
             
             {/* Quick Actions Grid */}
             <div>
-              <h2 className="text-lg font-bold text-white">Quick Navigation</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Quick Navigation</h2>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {navigationGrid.map((item, idx) => {
                   const Icon = item.icon;
@@ -139,17 +143,17 @@ export default function Dashboard() {
                     <Link
                       key={idx}
                       href={item.href}
-                      className={`group flex items-start gap-4 rounded-2xl border border-white/5 bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-white/10`}
+                      className={`group flex items-start gap-4 rounded-2xl border border-gray-250 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-350 dark:hover:border-white/10`}
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/5 text-slate-300 group-hover:bg-gradient-to-tr group-hover:from-cyan-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-300">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 group-hover:bg-gradient-to-tr group-hover:from-cyan-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-300">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-white flex items-center gap-1">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1">
                           {item.title}
                           <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                         </h3>
-                        <p className="mt-1 text-xs text-slate-400 leading-normal">{item.desc}</p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-normal">{item.desc}</p>
                       </div>
                     </Link>
                   );
@@ -159,14 +163,14 @@ export default function Dashboard() {
 
             {/* Workspaces List */}
             <div>
-              <h2 className="text-lg font-bold text-white">Active Workspaces</h2>
-              <div className="mt-4 overflow-hidden rounded-2xl border border-white/5 bg-slate-900/30 backdrop-blur-md">
-                <div className="divide-y divide-white/5">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Workspaces</h2>
+              <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/30 backdrop-blur-md">
+                <div className="divide-y divide-gray-150 dark:divide-white/5">
                   {workspaces.map((ws) => (
                     <div 
                       key={ws.id} 
                       onClick={() => selectWorkspace(ws)}
-                      className={`flex items-center justify-between p-4 hover:bg-slate-900/60 transition-colors cursor-pointer ${
+                      className={`flex items-center justify-between p-4 hover:bg-slate-100/50 dark:hover:bg-slate-900/60 transition-colors cursor-pointer ${
                         currentWorkspace?.id === ws.id ? 'bg-cyan-500/5 border-l-2 border-cyan-500' : ''
                       }`}
                     >
@@ -174,22 +178,22 @@ export default function Dashboard() {
                         <div className={`h-8 w-8 rounded-lg flex items-center justify-center border transition-colors ${
                           currentWorkspace?.id === ws.id 
                             ? 'bg-cyan-500/10 border-cyan-500/30' 
-                            : 'bg-white/5 border-white/5'
+                            : 'bg-slate-100 dark:bg-white/5 border-gray-200 dark:border-white/5'
                         }`}>
                           <FolderLock className={`h-4 w-4 ${
-                            currentWorkspace?.id === ws.id ? 'text-cyan-400' : 'text-slate-400'
+                            currentWorkspace?.id === ws.id ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-500 dark:text-slate-400'
                           }`} />
                         </div>
                         <div>
-                          <h3 className="text-sm font-semibold text-white flex items-center gap-1.5">
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
                             {ws.name}
                             {ws.owner_id === user.id && (
-                              <span className="inline-flex items-center rounded bg-cyan-400/10 px-1 py-0.5 text-[9px] font-semibold text-cyan-400">
+                              <span className="inline-flex items-center rounded bg-cyan-500/10 px-1 py-0.5 text-[9px] font-semibold text-cyan-600 dark:text-cyan-400">
                                 Owner
                               </span>
                             )}
                           </h3>
-                          <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
+                          <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                             <span className="flex items-center gap-0.5"><FileText className="h-3 w-3" /> 0 docs</span>
                             <span>•</span>
                             <span className="flex items-center gap-0.5"><Users className="h-3 w-3" /> 1 member</span>
@@ -197,12 +201,12 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {currentWorkspace?.id === ws.id ? 'Currently Selected' : 'Switch Workspace'}
                         </span>
-                        <div className="rounded-lg p-1.5 hover:bg-white/5 transition-colors">
+                        <div className="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                           <ArrowRight className={`h-4 w-4 ${
-                            currentWorkspace?.id === ws.id ? 'text-cyan-400' : 'text-slate-500'
+                            currentWorkspace?.id === ws.id ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-400'
                           }`} />
                         </div>
                       </div>
@@ -216,51 +220,51 @@ export default function Dashboard() {
 
           {/* Right Col: Operations Telemetry */}
           <div className="flex flex-col gap-6">
-            <h2 className="text-lg font-bold text-white">Diagnostics</h2>
-            <div className="rounded-2xl border border-white/5 bg-slate-900/40 p-5 backdrop-blur-md">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Diagnostics</h2>
+            <div className="rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 p-5 backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <CircleDollarSign className="h-4 w-4 text-emerald-400 animate-pulse" />
-                <h3 className="text-sm font-bold text-white">Cost & Token Ingestion</h3>
+                <CircleDollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400 animate-pulse" />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Cost & Token Ingestion</h3>
               </div>
               <div className="mt-4 space-y-3.5">
                 <div>
-                  <div className="flex justify-between text-xs text-slate-400">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>Input Tokens (This Month)</span>
-                    <span className="font-semibold text-slate-300">0</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">0</span>
                   </div>
-                  <div className="mt-1 h-1.5 w-full rounded-full bg-white/5">
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100 dark:bg-white/5">
                     <div className="h-full w-0 rounded-full bg-violet-600" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between text-xs text-slate-400">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>Output Tokens (This Month)</span>
-                    <span className="font-semibold text-slate-300">0</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">0</span>
                   </div>
-                  <div className="mt-1 h-1.5 w-full rounded-full bg-white/5">
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100 dark:bg-white/5">
                     <div className="h-full w-0 rounded-full bg-cyan-500" />
                   </div>
                 </div>
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
+                <div className="pt-2 border-t border-gray-150 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Estimated NIM Billing:</span>
-                  <span className="font-bold text-emerald-400">$0.00</span>
+                  <span className="font-bold text-emerald-500 dark:text-emerald-400">$0.00</span>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/5 bg-slate-900/40 p-5 backdrop-blur-md">
-              <h3 className="text-sm font-bold text-white">Active NIM Model Nodes</h3>
+            <div className="rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 p-5 backdrop-blur-md">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Active NIM Model Nodes</h3>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">nvidia/llama-3.1-nemotron-70b-instruct</span>
+                  <span className="text-slate-500 dark:text-slate-400">nvidia/llama-3.1-nemotron-70b-instruct</span>
                   <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500">Active</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">nvidia/nv-embedqa-e5-v5</span>
+                  <span className="text-slate-500 dark:text-slate-400">nvidia/nv-embedqa-e5-v5</span>
                   <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500">Active</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">nvidia/nv-rerankqa-mistral-4b-v3</span>
+                  <span className="text-slate-500 dark:text-slate-400">nvidia/nv-rerankqa-mistral-4b-v3</span>
                   <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500">Active</span>
                 </div>
               </div>
@@ -280,7 +284,7 @@ export default function Dashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowCreateModal(false)}
-              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/40 dark:bg-slate-950/80 backdrop-blur-sm"
             />
 
             {/* Modal Body */}
@@ -288,19 +292,19 @@ export default function Dashboard() {
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/5 bg-slate-900 p-6 shadow-2xl backdrop-blur-xl"
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900 p-6 shadow-2xl backdrop-blur-xl"
             >
               {/* Subtle top neon line */}
               <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-cyan-500 to-violet-500" />
 
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <FolderLock className="h-5 w-5 text-cyan-400" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <FolderLock className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                   Create New Workspace
                 </h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+                  className="rounded-lg p-1 text-slate-400 hover:bg-gray-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -308,13 +312,13 @@ export default function Dashboard() {
 
               <form onSubmit={handleCreateWorkspace} className="space-y-4">
                 {modalError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-400">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-500 dark:text-rose-400">
                     {modalError}
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor="dashboard-ws-name" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  <label htmlFor="dashboard-ws-name" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                     Workspace Name
                   </label>
                   <input
@@ -324,7 +328,7 @@ export default function Dashboard() {
                     placeholder="e.g. Legal Audits, Team Project"
                     value={newWorkspaceName}
                     onChange={(e) => setNewWorkspaceName(e.target.value)}
-                    className="block w-full rounded-xl border border-white/5 bg-slate-950/50 py-2.5 px-3 text-sm text-white placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/30"
+                    className="block w-full rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-slate-950/50 py-2.5 px-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/30"
                   />
                 </div>
 
@@ -332,7 +336,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="rounded-xl border border-white/5 bg-transparent px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-white/5 cursor-pointer"
+                    className="rounded-xl border border-gray-200 dark:border-white/5 bg-transparent px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
                   >
                     Cancel
                   </button>

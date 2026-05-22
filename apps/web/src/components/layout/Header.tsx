@@ -365,7 +365,7 @@ export default function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowCreateModal(false)}
-              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/40 dark:bg-slate-950/80 backdrop-blur-sm"
             />
 
             {/* Modal Body */}
@@ -373,19 +373,19 @@ export default function Header() {
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/5 bg-slate-900 p-6 shadow-2xl backdrop-blur-xl"
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900 p-6 shadow-2xl backdrop-blur-xl"
             >
               {/* Subtle top neon line */}
               <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-cyan-500 to-violet-500" />
 
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <FolderLock className="h-5 w-5 text-cyan-400" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <FolderLock className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                   Create New Workspace
                 </h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+                  className="rounded-lg p-1 text-slate-400 hover:bg-gray-100 hover:text-slate-900 dark:hover:bg-white/5 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -393,13 +393,13 @@ export default function Header() {
 
               <form onSubmit={handleCreateWorkspaceSubmit} className="space-y-4">
                 {modalError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-400">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-500 dark:text-rose-400">
                     {modalError}
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor="ws-name" className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  <label htmlFor="ws-name" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
                     Workspace Name
                   </label>
                   <input
@@ -409,7 +409,7 @@ export default function Header() {
                     placeholder="e.g. Legal Audits, Team Project"
                     value={newWorkspaceName}
                     onChange={(e) => setNewWorkspaceName(e.target.value)}
-                    className="block w-full rounded-xl border border-white/5 bg-slate-950/50 py-2.5 px-3 text-sm text-white placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/30"
+                    className="block w-full rounded-xl border border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-slate-950/50 py-2.5 px-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/30"
                   />
                 </div>
 
@@ -417,7 +417,7 @@ export default function Header() {
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="rounded-xl border border-white/5 bg-transparent px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-white/5 cursor-pointer"
+                    className="rounded-xl border border-gray-200 dark:border-white/5 bg-transparent px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
                   >
                     Cancel
                   </button>
