@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   appleWebApp: {
-    title: 'SecureDoc',
+    title: 'SecureDoc Copilot',
   },
 };
 

@@ -202,18 +202,27 @@ function getHeaders(token?: string | null): HeadersInit {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
   
-  const defaultHeaders = getHeaders();
-  if (options.body instanceof FormData) {
-    delete (defaultHeaders as Record<string, string>)['Content-Type'];
+  const defaultHeaders = getHeaders() as Record<string, string>;
+  const customHeaders = (options.headers || {}) as Record<string, string>;
+  
+  const mergedHeaders = {
+    ...defaultHeaders,
+    ...customHeaders,
+  };
+  
+  const isMultipart = options.body && (
+    options.body instanceof FormData || 
+    (typeof options.body === 'object' && 'append' in options.body)
+  );
+  
+  if (isMultipart) {
+    delete mergedHeaders['Content-Type'];
   }
   
   try {
     const response = await fetch(url, {
       ...options,
-      headers: {
-        ...defaultHeaders,
-        ...(options.headers || {}),
-      },
+      headers: mergedHeaders,
     });
 
     if (!response.ok) {
