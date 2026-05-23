@@ -452,8 +452,8 @@ export const api = {
     });
   },
 
-  async forgotPassword(email: string): Promise<{ detail: string }> {
-    return request<{ detail: string }>('/auth/forgot-password', {
+  async forgotPassword(email: string): Promise<{ detail: string; reset_token?: string | null }> {
+    return request<{ detail: string; reset_token?: string | null }>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });

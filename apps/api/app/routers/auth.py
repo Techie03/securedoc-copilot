@@ -193,12 +193,14 @@ def forgot_password(forgot_in: ForgotPasswordRequest, db: Session = Depends(get_
     Simulate forgot password reset email trigger.
     """
     user = crud.get_user_by_email(db, email=forgot_in.email)
+    reset_token_out = None
     if user:
         # Create reset token (expires in 15 minutes)
         reset_token = create_access_token(
             data={"sub": user.id, "email": user.email, "type": "reset"},
             expires_delta=timedelta(minutes=15)
         )
+        reset_token_out = reset_token
         reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
         
         print("\n" + "="*60)
@@ -208,7 +210,10 @@ def forgot_password(forgot_in: ForgotPasswordRequest, db: Session = Depends(get_
         print(f"CONTENT:\nHello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email.")
         print("="*60 + "\n")
         
-    return {"detail": "If the email is associated with a secure account, you will receive a reset link shortly."}
+    return {
+        "detail": "If the email is associated with a secure account, a reset link will be sent shortly.",
+        "reset_token": reset_token_out
+    }
 
 @router.post("/reset-password")
 def reset_password(reset_in: ResetPasswordRequest, db: Session = Depends(get_db)):

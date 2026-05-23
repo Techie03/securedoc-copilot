@@ -27,6 +27,7 @@ function LoginContent() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +38,13 @@ function LoginContent() {
     setForgotLoading(true);
     setForgotError(null);
     setForgotSuccess(null);
+    setResetToken(null);
     try {
       const res = await api.forgotPassword(forgotEmail);
-      setForgotSuccess(res.detail || 'Password reset link sent successfully! Check server logs to see the simulated email.');
+      setForgotSuccess(res.detail || 'Password reset link generated.');
+      if (res.reset_token) {
+        setResetToken(res.reset_token);
+      }
     } catch (err: any) {
       setForgotError(err.detail || 'Failed to submit reset request.');
     } finally {
@@ -179,14 +184,34 @@ function LoginContent() {
 
             {forgotSuccess ? (
               <div className="space-y-6">
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-650 dark:text-emerald-450 text-center leading-relaxed">
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-450 text-center leading-relaxed">
                   {forgotSuccess}
                 </div>
+
+                {resetToken ? (
+                  <div className="p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 dark:bg-cyan-500/10 text-center space-y-3">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Since this is a secure sandbox environment, we have generated your reset link below:
+                    </p>
+                    <Link
+                      href={`/reset-password?token=${resetToken}`}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-violet-600 py-2.5 text-xs font-bold text-white shadow-md hover:from-cyan-500 hover:to-violet-500 transition-all cursor-pointer animate-pulse"
+                    >
+                      Click here to Reset Password
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 dark:bg-rose-500/10 text-center text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Note: No registered account was found for this email address. Please verify your email or sign up first.
+                  </div>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
                     setShowForgotPassword(false);
                     setForgotSuccess(null);
+                    setResetToken(null);
                   }}
                   className="w-full flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg cursor-pointer"
                 >
