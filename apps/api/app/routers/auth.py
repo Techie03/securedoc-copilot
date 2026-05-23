@@ -258,6 +258,47 @@ async def send_resend_email(to_email: str, subject: str, body_text: str):
     except Exception as e:
         print(f"[Resend] Error sending email to {to_email}: {e}")
 
+async def send_brevo_email(to_email: str, subject: str, body_text: str):
+    """
+    Helper function to send a real email via Brevo API (HTTPS).
+    """
+    if not settings.BREVO_API_KEY:
+        print("[Brevo] BREVO_API_KEY not configured. Skipping Brevo email delivery.")
+        return
+
+    print(f"[Brevo] Preparing to send email to {to_email} via Brevo HTTP API")
+    url = "https://api.brevo.com/v3/smtp/email"
+    headers = {
+        "api-key": settings.BREVO_API_KEY,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    
+    sender_email = settings.BREVO_SENDER_EMAIL or settings.SMTP_FROM_EMAIL or "onboarding@brevo.com"
+    payload = {
+        "sender": {
+            "name": "SecureDoc Copilot",
+            "email": sender_email
+        },
+        "to": [
+            {
+                "email": to_email
+            }
+        ],
+        "subject": subject,
+        "textContent": body_text
+    }
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=payload, timeout=10.0)
+            if response.status_code >= 200 and response.status_code < 300:
+                print(f"[Brevo] Email successfully sent to {to_email}. Response: {response.json()}")
+            else:
+                print(f"[Brevo] Failed to send email to {to_email}. Status code: {response.status_code}. Detail: {response.text}")
+    except Exception as e:
+        print(f"[Brevo] Error sending email to {to_email}: {e}")
+
 @router.post("/forgot-password")
 def forgot_password(
     forgot_in: ForgotPasswordRequest, 
@@ -284,8 +325,15 @@ def forgot_password(
         
         email_body = f"Hello {user.full_name or 'User'},\n\nYour one-time password (OTP) to reset your password is:\n\n{otp_code}\n\nThis code will expire in 10 minutes.\nIf you did not request this, you can ignore this email."
         
-        # Trigger real email in background if Resend or SMTP is configured
-        if settings.RESEND_API_KEY:
+        # Trigger real email in background if Brevo, Resend, or SMTP is configured
+        if settings.BREVO_API_KEY:
+            background_tasks.add_task(
+                send_brevo_email,
+                user.email,
+                "SecureDoc Copilot - Password Reset OTP",
+                email_body
+            )
+        elif settings.RESEND_API_KEY:
             background_tasks.add_task(
                 send_resend_email,
                 user.email,
@@ -308,7 +356,7 @@ def forgot_password(
         print("="*60 + "\n")
         
     # Only return sandbox OTP to client if no real email sending credentials are configured
-    is_email_sending_enabled = bool(settings.RESEND_API_KEY or settings.SMTP_HOST)
+    is_email_sending_enabled = bool(settings.BREVO_API_KEY or settings.RESEND_API_KEY or settings.SMTP_HOST)
     return {
         "detail": "If the email is associated with a secure account, an OTP code will be sent shortly.",
         "otp_verify_token": otp_verify_token,

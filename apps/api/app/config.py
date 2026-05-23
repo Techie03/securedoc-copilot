@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     SMTP_FROM_EMAIL: str = ""
     SMTP_TLS: bool = True
     RESEND_API_KEY: str = ""
+    BREVO_API_KEY: str = ""
+    BREVO_SENDER_EMAIL: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
