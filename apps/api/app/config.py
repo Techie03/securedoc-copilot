@@ -39,6 +39,14 @@ class Settings(BaseSettings):
     # CORS Configurations
     ALLOWED_ORIGINS: str = "*"
 
+    # SMTP Configurations
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""
+    SMTP_TLS: bool = True
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

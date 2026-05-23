@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Request
 from sqlalchemy.orm import Session
 import httpx
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from app.config import settings
 from app.database import get_db
 from app.crud import crud
@@ -187,10 +190,51 @@ async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_d
         "token_type": "bearer"
     }
 
-@router.post("/forgot-password")
-def forgot_password(forgot_in: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def send_smtp_email(to_email: str, subject: str, body_text: str):
     """
-    Simulate forgot password reset email trigger.
+    Helper function to send a real email via SMTP.
+    """
+    if not settings.SMTP_HOST:
+        print("[SMTP] SMTP_HOST not configured. Skipping real email delivery.")
+        return
+
+    print(f"[SMTP] Preparing to send email to {to_email} via {settings.SMTP_HOST}:{settings.SMTP_PORT}")
+    try:
+        # Create message container
+        msg = MIMEMultipart()
+        msg['From'] = settings.SMTP_FROM_EMAIL or settings.SMTP_USER
+        msg['To'] = to_email
+        msg['Subject'] = subject
+
+        # Attach text body
+        msg.attach(MIMEText(body_text, 'plain'))
+
+        # Connect and send
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10)
+        
+        # Start TLS if enabled
+        if settings.SMTP_TLS:
+            server.starttls()
+            
+        # Login if user credentials provided
+        if settings.SMTP_USER and settings.SMTP_PASSWORD:
+            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+            
+        server.sendmail(msg['From'], to_email, msg.as_string())
+        server.quit()
+        print(f"[SMTP] Email successfully sent to {to_email}")
+    except Exception as e:
+        print(f"[SMTP] Error sending email to {to_email}: {e}")
+
+@router.post("/forgot-password")
+def forgot_password(
+    forgot_in: ForgotPasswordRequest, 
+    request: Request,
+    background_tasks: BackgroundTasks, 
+    db: Session = Depends(get_db)
+):
+    """
+    Simulate or trigger real forgot password reset email.
     """
     user = crud.get_user_by_email(db, email=forgot_in.email)
     reset_token_out = None
@@ -201,13 +245,39 @@ def forgot_password(forgot_in: ForgotPasswordRequest, db: Session = Depends(get_
             expires_delta=timedelta(minutes=15)
         )
         reset_token_out = reset_token
-        reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
+        
+        # Determine client origin dynamically
+        client_origin = request.headers.get("origin")
+        if not client_origin:
+            client_origin = request.headers.get("referer")
+        
+        if client_origin:
+            if client_origin.endswith("/"):
+                client_origin = client_origin[:-1]
+            if "/login" in client_origin:
+                client_origin = client_origin.split("/login")[0]
+            if "/reset-password" in client_origin:
+                client_origin = client_origin.split("/reset-password")[0]
+        else:
+            client_origin = "http://localhost:3000"
+            
+        reset_link = f"{client_origin}/reset-password?token={reset_token}"
+        email_body = f"Hello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email."
+        
+        # Trigger real email in background if SMTP is configured
+        if settings.SMTP_HOST:
+            background_tasks.add_task(
+                send_smtp_email,
+                user.email,
+                "SecureDoc Copilot - Reset Your Password Request",
+                email_body
+            )
         
         print("\n" + "="*60)
         print("SIMULATED PASSWORD RESET EMAIL SENDER")
         print(f"TO:      {user.email}")
         print(f"SUBJECT: SecureDoc Copilot - Reset Your Password Request")
-        print(f"CONTENT:\nHello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email.")
+        print(f"CONTENT:\n{email_body}")
         print("="*60 + "\n")
         
     return {
