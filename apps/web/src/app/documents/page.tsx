@@ -500,19 +500,19 @@ export default function DocumentLibrary() {
                         <thead>
                           <tr className="bg-slate-100/80 dark:bg-slate-900/50">
                             <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400">Document Name</th>
-                            <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400">Format</th>
+                            <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 hidden sm:table-cell">Format</th>
                             <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400">Status</th>
-                            <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400">Uploaded</th>
+                            <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 hidden md:table-cell">Uploaded</th>
                             <th className="py-3.5 px-4 text-xs font-semibold text-slate-600 dark:text-slate-400 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-white/5">
                           {filteredDocs.map((doc) => (
                             <tr key={doc.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
-                              <td className="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-white truncate max-w-[200px]">
+                              <td className="py-3 px-4 text-xs font-semibold text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-[250px]">
                                 {doc.filename}
                               </td>
-                              <td className="py-3 px-4 text-xs">
+                              <td className="py-3 px-4 text-xs hidden sm:table-cell">
                                 {getFileIcon(doc.file_type)}
                               </td>
                               <td className="py-3 px-4 text-xs">
@@ -535,7 +535,7 @@ export default function DocumentLibrary() {
                                   </span>
                                 )}
                               </td>
-                              <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400">
+                              <td className="py-3 px-4 text-xs text-slate-500 dark:text-slate-400 hidden md:table-cell">
                                 {formatDate(doc.created_at)}
                               </td>
                               <td className="py-3 px-4 text-xs text-right">

@@ -108,7 +108,7 @@ export default function Header() {
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
                 </span>
               </div>
-              <div className="flex items-center">
+              <div className="hidden min-[500px]:flex items-center">
                 <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-gray-950 via-slate-900 to-gray-800 bg-clip-text text-transparent dark:from-white dark:via-slate-100 dark:to-slate-300">
                   SecureDoc
                 </span>

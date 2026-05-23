@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { api, ChatSession, ChatMessage, Memory, DocumentResponse } from '@/lib/api';
+import { useDevicePlatform } from '@/lib/hooks/useDevicePlatform';
 import {
   MessageSquare,
   Plus,
@@ -27,7 +28,8 @@ import {
   Info,
   LineChart,
   LayoutGrid,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
@@ -50,6 +52,7 @@ function getMockFileSize(filename: string, id: string): string {
 
 export default function ChatPage() {
   const { currentWorkspace, loading: authLoading } = useAuth();
+  const platform = useDevicePlatform();
   
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSession, setActiveSession] = useState<ChatSession | null>(null);
@@ -63,7 +66,8 @@ export default function ChatPage() {
   
   const [inputMessage, setInputMessage] = useState('');
   const [selectedMode, setSelectedMode] = useState('rag');
-  const [showTelemetry, setShowTelemetry] = useState(true);
+  const [showTelemetry, setShowTelemetry] = useState(false);
+  const [mobileSessionsOpen, setMobileSessionsOpen] = useState(false);
   const [documents, setDocuments] = useState<DocumentResponse[]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<'documents' | 'telemetry'>('documents');
@@ -331,17 +335,66 @@ export default function ChatPage() {
   const activeRun = lastAssistantMsg?.chat_run;
   const activeEval = lastAssistantMsg?.evaluation_scores;
 
+  const getUserBubbleClass = () => {
+    if (platform === 'ios') {
+      return 'bg-gradient-to-tr from-blue-600 to-indigo-650 text-white rounded-3xl rounded-tr-sm border-transparent shadow-sm';
+    }
+    if (platform === 'android') {
+      return 'bg-cyan-600 dark:bg-cyan-700 text-white rounded-2xl rounded-tr-none border-transparent shadow-md';
+    }
+    return 'bg-slate-100 dark:bg-slate-900 border-slate-250 dark:border-white/5 rounded-tr-none text-slate-850 dark:text-slate-100 shadow-sm';
+  };
+
+  const getAssistantBubbleClass = () => {
+    if (platform === 'ios') {
+      return 'bg-slate-100/90 dark:bg-slate-900/60 border-slate-250 dark:border-white/5 rounded-3xl rounded-tl-sm text-slate-850 dark:text-slate-200 backdrop-blur-md';
+    }
+    if (platform === 'android') {
+      return 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 rounded-2xl rounded-tl-none text-slate-750 dark:text-slate-200 shadow-sm';
+    }
+    return 'bg-white/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-white/5 rounded-tl-none text-slate-700 dark:text-slate-200 backdrop-blur-sm';
+  };
+
   return (
     <div className="flex-1 flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-[calc(100vh-4rem)] overflow-hidden w-full relative">
       {/* Glow Effect */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-violet-600/5 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl -z-10" />
 
+      {/* Sessions Sidebar Backdrop (mobile only) */}
+      <AnimatePresence>
+        {mobileSessionsOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm lg:hidden"
+            onClick={() => setMobileSessionsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* 1. SESSIONS SIDEBAR */}
-      <div className="w-80 border-r border-gray-250 dark:border-white/5 bg-white/70 dark:bg-slate-900/20 backdrop-blur-xl flex flex-col shrink-0">
-        <div className="p-4 border-b border-gray-250 dark:border-white/5">
+      <div className={`w-80 border-r border-gray-250 dark:border-white/5 bg-white dark:bg-slate-950 lg:bg-white/70 lg:dark:bg-slate-900/20 lg:backdrop-blur-xl flex flex-col shrink-0 transition-transform duration-300 fixed inset-y-0 left-0 z-50 lg:static lg:translate-x-0 ${
+        mobileSessionsOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        {/* Mobile Header for Sidebar Drawer */}
+        <div className="p-4 border-b border-gray-250 dark:border-white/5 flex items-center justify-between lg:hidden shrink-0">
+          <span className="font-bold text-xs text-slate-500 uppercase tracking-wider">Chat History</span>
           <button
-            onClick={handleCreateSession}
+            onClick={() => setMobileSessionsOpen(false)}
+            className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-4 border-b border-gray-250 dark:border-white/5 shrink-0">
+          <button
+            onClick={() => {
+              handleCreateSession();
+              setMobileSessionsOpen(false); // Auto-close drawer on selection
+            }}
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 py-3 text-sm font-semibold text-white shadow-md shadow-violet-500/10 hover:shadow-cyan-500/25 transition-all duration-300 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
@@ -363,10 +416,13 @@ export default function ChatPage() {
             sessions.map((s) => (
               <div
                 key={s.id}
-                onClick={() => setActiveSession(s)}
+                onClick={() => {
+                  setActiveSession(s);
+                  setMobileSessionsOpen(false); // Auto-close drawer on selection
+                }}
                 className={`group flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-300 ${
                   activeSession?.id === s.id
-                    ? 'bg-slate-100 dark:bg-white/5 border-cyan-500/30 dark:border-cyan-500/30 text-slate-900 dark:text-white'
+                    ? 'bg-slate-100 dark:bg-white/5 border-cyan-500/30 dark:border-cyan-500/30 text-slate-900 dark:text-white font-semibold'
                     : 'bg-transparent border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5/40 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
@@ -389,19 +445,28 @@ export default function ChatPage() {
       {/* 2. MAIN CHAT THREAD */}
       <div className="flex-1 flex flex-col bg-transparent min-w-0">
         {/* Chat Header */}
-        <div className="h-16 border-b border-gray-250 dark:border-white/5 px-6 flex items-center justify-between bg-white/50 dark:bg-slate-900/10 backdrop-blur-md">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <span className="font-bold text-slate-900 dark:text-white truncate">
+        <div className="h-16 border-b border-gray-250 dark:border-white/5 px-4 sm:px-6 flex items-center justify-between bg-white/50 dark:bg-slate-900/10 backdrop-blur-md shrink-0">
+          <div className="flex items-center gap-2 overflow-hidden">
+            {/* Sessions history button on mobile */}
+            <button
+              onClick={() => setMobileSessionsOpen(true)}
+              className="lg:hidden p-2 -ml-1 rounded-xl border border-gray-200 dark:border-white/10 text-slate-500 hover:text-slate-750 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              title="View Chat History"
+            >
+              <MessageSquare className="h-4 w-4" />
+            </button>
+
+            <span className="font-bold text-slate-900 dark:text-white truncate text-sm sm:text-base">
               {activeSession ? activeSession.title : 'Secure Agent Interface'}
             </span>
             {activeSession && (
-              <span className="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="hidden sm:inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 NVIDIA NIM Meta Llama 70B Active
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Mode selection button */}
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 rounded-xl p-1 border border-slate-250 dark:border-white/5">
               {MODE_CONFIGS.map((m) => {
@@ -425,14 +490,14 @@ export default function ChatPage() {
             
             <button
               onClick={() => setShowTelemetry(!showTelemetry)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
                 showTelemetry 
                   ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-500 dark:text-cyan-400' 
                   : 'bg-transparent border-slate-250 dark:border-white/5 text-slate-500 dark:text-slate-400'
               }`}
             >
               <Gauge className="h-3.5 w-3.5" />
-              <span>Telemetry</span>
+              <span className="hidden sm:inline">Telemetry</span>
             </button>
           </div>
         </div>
@@ -528,10 +593,8 @@ export default function ChatPage() {
 
                     {/* Bubble Content */}
                     <div
-                      className={`relative max-w-2xl px-5 py-4 rounded-3xl border text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
-                        isUser
-                          ? 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-white/5 rounded-tr-none text-slate-800 dark:text-slate-100 shadow-sm'
-                          : 'bg-white/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-white/5 rounded-tl-none text-slate-700 dark:text-slate-200 backdrop-blur-sm'
+                      className={`relative max-w-2xl px-5 py-4 text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
+                        isUser ? getUserBubbleClass() : getAssistantBubbleClass()
                       }`}
                     >
                       {msg.content}
@@ -631,21 +694,24 @@ export default function ChatPage() {
 
         {/* Input Bar */}
         {activeSession && (
-          <div className="p-6 bg-white/50 dark:bg-slate-900/10 border-t border-slate-200 dark:border-white/5">
+          <div 
+            className="p-4 sm:p-6 bg-white/50 dark:bg-slate-900/10 border-t border-slate-200 dark:border-white/5 shrink-0"
+            style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
+          >
             <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto relative flex items-center gap-3">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Ask secure agent... (e.g. Find key clauses, code assistance, memory summary)"
-                className="flex-1 rounded-2xl border border-slate-250 dark:border-white/5 bg-white dark:bg-slate-900/50 py-3.5 pl-4 pr-14 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
+                className="flex-1 rounded-2xl border border-slate-250 dark:border-white/5 bg-white dark:bg-slate-900/50 py-3 sm:py-3.5 pl-4 pr-12 sm:pr-14 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
                 disabled={sendLoading}
               />
               
               <button
                 type="submit"
                 disabled={sendLoading || !inputMessage.trim()}
-                className="absolute right-2.5 p-2 rounded-xl bg-cyan-600 text-white disabled:opacity-40 hover:bg-cyan-500 shadow-md shadow-cyan-500/10 transition-all cursor-pointer"
+                className="absolute right-2 sm:right-2.5 p-2 rounded-xl bg-cyan-600 text-white disabled:opacity-40 hover:bg-cyan-500 shadow-md shadow-cyan-500/10 transition-all cursor-pointer"
               >
                 {sendLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -654,10 +720,12 @@ export default function ChatPage() {
                 )}
               </button>
             </form>
-            <div className="max-w-3xl mx-auto mt-2.5 flex items-center justify-between text-[10px] text-slate-500">
+            <div className="max-w-3xl mx-auto mt-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 text-[10px] text-slate-500">
               <span className="flex items-center gap-1">
-                <Info className="h-3 w-3 text-slate-450 dark:text-slate-650" />
-                Context window personalizes responses dynamically via workspace filter memory.
+                <Info className="h-3 w-3 text-slate-450 dark:text-slate-650 shrink-0" />
+                <span className="truncate max-w-[280px] sm:max-w-none">
+                  Context window personalizes responses dynamically via workspace filter memory.
+                </span>
               </span>
               <span>
                 Selected: <span className="text-cyan-600 dark:text-cyan-400 font-bold uppercase">{selectedMode === 'rag' ? 'Document-Based' : 'General'}</span>
@@ -668,274 +736,294 @@ export default function ChatPage() {
       </div>
 
       {/* 3. TELEMETRY & MEMORY PANEL */}
+      {/* Telemetry Sidebar Backdrop (mobile only) */}
       <AnimatePresence>
         {showTelemetry && (
           <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: 380 }}
-            exit={{ opacity: 0, width: 0 }}
-            className="border-l border-white/5 bg-slate-900/20 backdrop-blur-xl flex flex-col shrink-0 overflow-hidden"
-          >
-            {/* Header Tabs */}
-            <div className="p-3 border-b border-white/5 bg-slate-950/20 shrink-0">
-              <div className="flex gap-1.5 bg-slate-950/40 p-1 rounded-xl border border-white/5">
-                <button
-                  type="button"
-                  onClick={() => setActiveRightTab('documents')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
-                    activeRightTab === 'documents'
-                      ? 'bg-gradient-to-r from-violet-600/30 to-cyan-600/30 text-white border border-cyan-500/20 shadow-sm shadow-cyan-500/5'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Database className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Ingested Docs</span>
-                  {documents.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-400 text-[9px] font-extrabold border border-cyan-500/30">
-                      {documents.length}
-                    </span>
-                  )}
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => setActiveRightTab('telemetry')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
-                    activeRightTab === 'telemetry'
-                      ? 'bg-gradient-to-r from-violet-600/30 to-cyan-600/30 text-white border border-cyan-500/20 shadow-sm shadow-cyan-500/5'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Gauge className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Telemetry</span>
-                </button>
-              </div>
-            </div>
-
-            {activeRightTab === 'documents' ? (
-              <div className="flex-1 flex flex-col min-h-0 bg-transparent">
-                <div className="p-4 border-b border-white/5 flex items-center justify-between bg-slate-900/10 shrink-0">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Workspace Ingested Data
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => loadDocuments()}
-                    disabled={documentsLoading}
-                    title="Refresh document list"
-                    className="p-1.5 rounded-lg border border-white/5 bg-slate-900/30 text-slate-400 hover:text-white hover:bg-slate-900/80 transition-all duration-300 disabled:opacity-50 cursor-pointer"
-                  >
-                    <RefreshCw className={`h-3 w-3 ${documentsLoading ? 'animate-spin' : ''}`} />
-                  </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
-                  {documentsLoading && documents.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-2">
-                      <Loader2 className="h-6 w-6 animate-spin text-cyan-500 dark:text-cyan-400" />
-                      <span className="text-xs text-slate-500">Loading ingested documents...</span>
-                    </div>
-                  ) : documents.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center text-center py-12 px-4 rounded-2xl border border-white/5 bg-slate-900/20">
-                      <FileText className="h-8 w-8 text-slate-600 mb-3" />
-                      <h4 className="text-sm font-semibold text-slate-350">No Documents Ingested</h4>
-                      <p className="text-xs text-slate-500 mt-1 max-w-[240px] leading-relaxed">
-                        To enable Document-Based query mode, upload files in the document workspace first.
-                      </p>
-                      <a
-                        href="/documents"
-                        className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:bg-cyan-500 transition-all duration-300"
-                      >
-                        <span>Upload Documents</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </a>
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {documents.map((doc) => (
-                        <div
-                          key={doc.id}
-                          className="flex items-center justify-between p-3 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/50 transition-all duration-200"
-                        >
-                          <div className="flex items-center gap-3 min-w-0">
-                            {getCompactFileIcon(doc.file_type)}
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-white truncate max-w-[170px]" title={doc.filename}>
-                                {doc.filename}
-                              </p>
-                              <p className="text-[10px] text-slate-500 mt-0.5">
-                                Size: {getMockFileSize(doc.filename, doc.id)}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="shrink-0 flex items-center gap-1">
-                            {getStatusBadge(doc.status)}
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="pt-2">
-                        <a
-                          href="/documents"
-                          className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-white/5 bg-slate-900/30 hover:bg-slate-900/60 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-all duration-300"
-                        >
-                          <span>Manage Workspace Documents</span>
-                          <ChevronRight className="h-3.5 w-3.5" />
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-                {/* Run Stats */}
-                <div className="p-5 border-b border-white/5 space-y-4 shrink-0">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Last Assistant Run Performance
-                  </h3>
-                  
-                  {activeRun ? (
-                    <div className="grid grid-cols-2 gap-3.5">
-                      <div className="rounded-xl border border-white/5 bg-white/5/30 p-3">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> Latency
-                        </div>
-                        <div className="mt-1 text-base font-bold text-white">
-                          {activeRun.latency_ms} ms
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-white/5 bg-white/5/30 p-3">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
-                          <CircleDollarSign className="h-3 w-3 text-emerald-400" /> Cost Est.
-                        </div>
-                        <div className="mt-1 text-base font-bold text-emerald-400">
-                          ${activeRun.estimated_cost?.toFixed(5)}
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-white/5 bg-white/5/30 p-3">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase">
-                          Prompt Tokens
-                        </div>
-                        <div className="mt-1 text-sm font-bold text-slate-200">
-                          {activeRun.prompt_tokens}
-                        </div>
-                      </div>
-                      <div className="rounded-xl border border-white/5 bg-white/5/30 p-3">
-                        <div className="text-[10px] font-bold text-slate-500 uppercase">
-                          Completion Tokens
-                        </div>
-                        <div className="mt-1 text-sm font-bold text-slate-200">
-                          {activeRun.completion_tokens}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-slate-500 py-2">
-                      No telemetry metrics captured yet. Send a message to run NVIDIA NIM evaluation models.
-                    </div>
-                  )}
-                </div>
-
-                {/* RAG Quality Evaluator details */}
-                <div className="p-5 border-b border-white/5 space-y-4 shrink-0">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <LineChart className="h-4 w-4 text-cyan-400" />
-                    NVIDIA NIM Quality Evaluators
-                  </h3>
-                  
-                  {activeEval ? (
-                    <div className="space-y-3 text-xs">
-                      <div>
-                        <div className="flex justify-between text-[11px] mb-1 font-semibold">
-                          <span className="text-slate-400">Faithfulness Metric</span>
-                          <span className="text-emerald-400">{Math.round((activeEval.faithfulness || 0) * 100)}%</span>
-                        </div>
-                        <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                          <div 
-                            className="h-full rounded-full bg-emerald-500 transition-all duration-500" 
-                            style={{ width: `${(activeEval.faithfulness || 0) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between text-[11px] mb-1 font-semibold">
-                          <span className="text-slate-400">Context Relevance</span>
-                          <span className="text-cyan-400">{Math.round((activeEval.relevance || 0) * 100)}%</span>
-                        </div>
-                        <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                          <div 
-                            className="h-full rounded-full bg-cyan-500 transition-all duration-500" 
-                            style={{ width: `${(activeEval.relevance || 0) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between text-[11px] mb-1 font-semibold">
-                          <span className="text-slate-400">Hallucination Risk</span>
-                          <span className={activeEval.hallucination_risk && activeEval.hallucination_risk > 0.2 ? 'text-rose-400' : 'text-slate-400'}>
-                            {Math.round((activeEval.hallucination_risk || 0) * 100)}%
-                          </span>
-                        </div>
-                        <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              activeEval.hallucination_risk && activeEval.hallucination_risk > 0.2 ? 'bg-rose-500' : 'bg-slate-500'
-                            }`}
-                            style={{ width: `${(activeEval.hallucination_risk || 0) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-xs text-slate-500">
-                      Quality scores (Faithfulness, Hallucination Risk) are calculated automatically on assistant answers in document RAG pathways.
-                    </div>
-                  )}
-                </div>
-
-                {/* Context Workspace Memory values loaded */}
-                <div className="p-5 space-y-4 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                      <Brain className="h-4 w-4 text-cyan-400" />
-                      Active Memory Context ({memories.length})
-                    </h3>
-                  </div>
-
-                  {memoriesLoading ? (
-                    <div className="flex items-center gap-2 py-4">
-                      <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
-                      <span className="text-xs text-slate-500">Syncing memory profiles...</span>
-                    </div>
-                  ) : memories.length === 0 ? (
-                    <div className="text-xs text-slate-500">
-                      No memories detected in database. Speak normally or customize memories in the Memory Manager to persist preferences.
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5 max-h-80 overflow-y-auto">
-                      {memories.map((mem) => (
-                        <div
-                          key={mem.id}
-                          className="rounded-xl border border-white/5 bg-slate-900/50 p-3 text-xs backdrop-blur-sm"
-                        >
-                          <div className="flex items-center justify-between font-bold text-cyan-400 mb-1 text-[10px] uppercase tracking-wide">
-                            <span>{mem.memory_key}</span>
-                            <span className="text-slate-500 font-normal lowercase">{mem.type}</span>
-                          </div>
-                          <p className="text-slate-300 leading-normal text-[11px]">{mem.memory_value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm lg:hidden"
+            onClick={() => setShowTelemetry(false)}
+          />
         )}
       </AnimatePresence>
+
+      <div
+        className={`border-l border-gray-250 dark:border-white/5 bg-white dark:bg-slate-950 lg:bg-slate-900/20 lg:backdrop-blur-xl flex flex-col shrink-0 transition-all duration-300 overflow-hidden
+          fixed inset-y-0 right-0 z-50 w-80 max-w-[calc(100vw-3rem)] lg:static lg:w-[380px] lg:translate-x-0 ${
+            showTelemetry ? 'translate-x-0 opacity-100 lg:w-[380px]' : 'translate-x-full opacity-0 lg:translate-x-0 lg:w-0 lg:border-l-0 lg:opacity-100'
+          }`}
+      >
+        {/* Mobile Header for Telemetry Drawer */}
+        <div className="p-4 border-b border-gray-250 dark:border-white/5 flex items-center justify-between lg:hidden shrink-0">
+          <span className="font-bold text-xs text-slate-500 uppercase tracking-wider">Telemetry & Quality</span>
+          <button
+            onClick={() => setShowTelemetry(false)}
+            className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Header Tabs */}
+        <div className="p-3 border-b border-gray-250 dark:border-white/5 bg-slate-100/50 dark:bg-slate-950/20 shrink-0">
+          <div className="flex gap-1.5 bg-slate-200/50 dark:bg-slate-950/40 p-1 rounded-xl border border-gray-200 dark:border-white/5">
+            <button
+              type="button"
+              onClick={() => setActiveRightTab('documents')}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeRightTab === 'documents'
+                  ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-white/10 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              <Database className="h-3.5 w-3.5 text-cyan-500 dark:text-cyan-400" />
+              <span>Ingested Docs</span>
+              {documents.length > 0 && (
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[9px] font-extrabold border border-cyan-500/30">
+                  {documents.length}
+                </span>
+              )}
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setActiveRightTab('telemetry')}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeRightTab === 'telemetry'
+                  ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-white/10 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              <Gauge className="h-3.5 w-3.5 text-cyan-500 dark:text-cyan-400" />
+              <span>Telemetry</span>
+            </button>
+          </div>
+        </div>
+
+        {activeRightTab === 'documents' ? (
+          <div className="flex-1 flex flex-col min-h-0 bg-transparent">
+            <div className="p-4 border-b border-gray-250 dark:border-white/5 flex items-center justify-between bg-slate-100/30 dark:bg-slate-900/10 shrink-0">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Workspace Ingested Data
+              </span>
+              <button
+                type="button"
+                onClick={() => loadDocuments()}
+                disabled={documentsLoading}
+                title="Refresh document list"
+                className="p-1.5 rounded-lg border border-gray-250 dark:border-white/5 bg-slate-100 dark:bg-slate-900/30 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-900/80 transition-all duration-300 disabled:opacity-50 cursor-pointer"
+              >
+                <RefreshCw className={`h-3 w-3 ${documentsLoading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
+              {documentsLoading && documents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-cyan-500 dark:text-cyan-400" />
+                  <span className="text-xs text-slate-500">Loading ingested documents...</span>
+                </div>
+              ) : documents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center py-12 px-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-900/20">
+                  <FileText className="h-8 w-8 text-slate-450 dark:text-slate-650 mb-3" />
+                  <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-350">No Documents Ingested</h4>
+                  <p className="text-xs text-slate-550 dark:text-slate-500 mt-1 max-w-[240px] leading-relaxed">
+                    To enable Document-Based query mode, upload files in the document workspace first.
+                  </p>
+                  <a
+                    href="/documents"
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:bg-cyan-500 transition-all duration-300"
+                  >
+                    <span>Upload Documents</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {documents.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/50 dark:hover:bg-slate-900/50 transition-all duration-200"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {getCompactFileIcon(doc.file_type)}
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[150px]" title={doc.filename}>
+                            {doc.filename}
+                          </p>
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
+                            Size: {getMockFileSize(doc.filename, doc.id)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="shrink-0 flex items-center gap-1">
+                        {getStatusBadge(doc.status)}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-2">
+                    <a
+                      href="/documents"
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/50 dark:hover:bg-slate-900/60 py-2.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all duration-300"
+                    >
+                      <span>Manage Workspace Documents</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+            {/* Run Stats */}
+            <div className="p-5 border-b border-gray-250 dark:border-white/5 space-y-4 shrink-0">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400">
+                Last Assistant Run Performance
+              </h3>
+              
+              {activeRun ? (
+                <div className="grid grid-cols-2 gap-3.5">
+                  <div className="rounded-xl border border-gray-250 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> Latency
+                    </div>
+                    <div className="mt-1 text-base font-bold text-slate-800 dark:text-white">
+                      {activeRun.latency_ms} ms
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-gray-250 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
+                      <CircleDollarSign className="h-3 w-3 text-emerald-500 dark:text-emerald-400" /> Cost Est.
+                    </div>
+                    <div className="mt-1 text-base font-bold text-emerald-600 dark:text-emerald-400">
+                      ${activeRun.estimated_cost?.toFixed(5)}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-gray-250 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">
+                      Prompt Tokens
+                    </div>
+                    <div className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200">
+                      {activeRun.prompt_tokens}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-gray-250 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">
+                      Completion Tokens
+                    </div>
+                    <div className="mt-1 text-sm font-bold text-slate-700 dark:text-slate-200">
+                      {activeRun.completion_tokens}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500 py-2">
+                  No telemetry metrics captured yet. Send a message to run NVIDIA NIM evaluation models.
+                </div>
+              )}
+            </div>
+
+            {/* RAG Quality Evaluator details */}
+            <div className="p-5 border-b border-gray-250 dark:border-white/5 space-y-4 shrink-0">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 flex items-center gap-1.5">
+                <LineChart className="h-4 w-4 text-cyan-500 dark:text-cyan-400" />
+                NVIDIA NIM Quality Evaluators
+              </h3>
+              
+              {activeEval ? (
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1 font-semibold">
+                      <span className="text-slate-550 dark:text-slate-400">Faithfulness Metric</span>
+                      <span className="text-emerald-650 dark:text-emerald-450">{Math.round((activeEval.faithfulness || 0) * 100)}%</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-white/5 overflow-hidden">
+                      <div 
+                        className="h-full rounded-full bg-emerald-500 transition-all duration-500" 
+                        style={{ width: `${(activeEval.faithfulness || 0) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1 font-semibold">
+                      <span className="text-slate-550 dark:text-slate-400">Context Relevance</span>
+                      <span className="text-cyan-600 dark:text-cyan-455">{Math.round((activeEval.relevance || 0) * 100)}%</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-white/5 overflow-hidden">
+                      <div 
+                        className="h-full rounded-full bg-cyan-500 transition-all duration-500" 
+                        style={{ width: `${(activeEval.relevance || 0) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1 font-semibold">
+                      <span className="text-slate-550 dark:text-slate-400">Hallucination Risk</span>
+                      <span className={activeEval.hallucination_risk && activeEval.hallucination_risk > 0.2 ? 'text-rose-500 dark:text-rose-455' : 'text-slate-500 dark:text-slate-400'}>
+                        {Math.round((activeEval.hallucination_risk || 0) * 100)}%
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-white/5 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          activeEval.hallucination_risk && activeEval.hallucination_risk > 0.2 ? 'bg-rose-500' : 'bg-slate-400 dark:bg-slate-500'
+                        }`}
+                        style={{ width: `${(activeEval.hallucination_risk || 0) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500">
+                  Quality scores (Faithfulness, Hallucination Risk) are calculated automatically on assistant answers in document RAG pathways.
+                </div>
+              )}
+            </div>
+
+            {/* Context Workspace Memory values loaded */}
+            <div className="p-5 space-y-4 flex-1">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 flex items-center gap-1.5">
+                  <Brain className="h-4 w-4 text-cyan-550 dark:text-cyan-400" />
+                  Active Memory Context ({memories.length})
+                </h3>
+              </div>
+
+              {memoriesLoading ? (
+                <div className="flex items-center gap-2 py-4">
+                  <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+                  <span className="text-xs text-slate-500">Syncing memory profiles...</span>
+                </div>
+              ) : memories.length === 0 ? (
+                <div className="text-xs text-slate-500">
+                  No memories detected in database. Speak normally or customize memories in the Memory Manager to persist preferences.
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-80 overflow-y-auto">
+                  {memories.map((mem) => (
+                    <div
+                      key={mem.id}
+                      className="rounded-xl border border-gray-250 dark:border-white/5 bg-slate-50 dark:bg-slate-900/50 p-3 text-xs backdrop-blur-sm"
+                    >
+                      <div className="flex items-center justify-between font-bold text-cyan-600 dark:text-cyan-400 mb-1 text-[10px] uppercase tracking-wide">
+                        <span>{mem.memory_key}</span>
+                        <span className="text-slate-455 dark:text-slate-500 font-normal lowercase">{mem.type}</span>
+                      </div>
+                      <p className="text-slate-650 dark:text-slate-300 leading-normal text-[11px]">{mem.memory_value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

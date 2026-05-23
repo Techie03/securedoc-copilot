@@ -124,6 +124,30 @@ export default function Home() {
           </a>
         </motion.div>
 
+        {/* Product Demo Video */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="mt-16 w-full max-w-4xl mx-auto rounded-3xl bg-gradient-to-tr from-violet-500 via-cyan-500 to-indigo-500 p-[1.5px] shadow-2xl shadow-violet-500/10 dark:shadow-violet-950/20 relative"
+        >
+          {/* Neon background glows */}
+          <div className="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-violet-500 to-cyan-500 opacity-20 blur-lg -z-10 animate-pulse" />
+          
+          <div className="overflow-hidden rounded-[22px] bg-slate-900 aspect-video relative flex items-center justify-center">
+            <video
+              src="https://github.com/user-attachments/assets/63005eb6-0282-4944-b7e6-89ece03d411c"
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </motion.div>
+
         {/* Core Features Grid */}
         <motion.div
           variants={containerVariants}
