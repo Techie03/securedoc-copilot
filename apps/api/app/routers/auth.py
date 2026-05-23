@@ -307,10 +307,12 @@ def forgot_password(
         print(f"OTP:     {otp_code}")
         print("="*60 + "\n")
         
+    # Only return sandbox OTP to client if no real email sending credentials are configured
+    is_email_sending_enabled = bool(settings.RESEND_API_KEY or settings.SMTP_HOST)
     return {
         "detail": "If the email is associated with a secure account, an OTP code will be sent shortly.",
         "otp_verify_token": otp_verify_token,
-        "sandbox_otp": otp_code
+        "sandbox_otp": None if is_email_sending_enabled else otp_code
     }
 
 @router.post("/verify-otp")
