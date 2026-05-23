@@ -226,6 +226,37 @@ def send_smtp_email(to_email: str, subject: str, body_text: str):
     except Exception as e:
         print(f"[SMTP] Error sending email to {to_email}: {e}")
 
+async def send_resend_email(to_email: str, subject: str, body_text: str):
+    """
+    Helper function to send a real email via Resend API (HTTPS).
+    """
+    if not settings.RESEND_API_KEY:
+        print("[Resend] RESEND_API_KEY not configured. Skipping Resend email delivery.")
+        return
+
+    print(f"[Resend] Preparing to send email to {to_email} via Resend HTTP API")
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "from": settings.SMTP_FROM_EMAIL or "onboarding@resend.dev",
+        "to": [to_email],
+        "subject": subject,
+        "text": body_text
+    }
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=payload, timeout=10.0)
+            if response.status_code >= 200 and response.status_code < 300:
+                print(f"[Resend] Email successfully sent to {to_email}. Response: {response.json()}")
+            else:
+                print(f"[Resend] Failed to send email to {to_email}. Status code: {response.status_code}. Detail: {response.text}")
+    except Exception as e:
+        print(f"[Resend] Error sending email to {to_email}: {e}")
+
 @router.post("/forgot-password")
 def forgot_password(
     forgot_in: ForgotPasswordRequest, 
@@ -264,8 +295,15 @@ def forgot_password(
         reset_link = f"{client_origin}/reset-password?token={reset_token}"
         email_body = f"Hello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email."
         
-        # Trigger real email in background if SMTP is configured
-        if settings.SMTP_HOST:
+        # Trigger real email in background if Resend or SMTP is configured
+        if settings.RESEND_API_KEY:
+            background_tasks.add_task(
+                send_resend_email,
+                user.email,
+                "SecureDoc Copilot - Reset Your Password Request",
+                email_body
+            )
+        elif settings.SMTP_HOST:
             background_tasks.add_task(
                 send_smtp_email,
                 user.email,
