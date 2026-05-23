@@ -452,10 +452,17 @@ export const api = {
     });
   },
 
-  async forgotPassword(email: string): Promise<{ detail: string; reset_token?: string | null }> {
-    return request<{ detail: string; reset_token?: string | null }>('/auth/forgot-password', {
+  async forgotPassword(email: string): Promise<{ detail: string; otp_verify_token?: string | null; sandbox_otp?: string | null }> {
+    return request<{ detail: string; otp_verify_token?: string | null; sandbox_otp?: string | null }>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
+    });
+  },
+
+  async verifyOtp(token: string, otp: string): Promise<{ detail: string; reset_token: string }> {
+    return request<{ detail: string; reset_token: string }>('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ token, otp }),
     });
   },
 

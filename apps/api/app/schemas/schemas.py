@@ -40,6 +40,10 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
+class VerifyOTPRequest(BaseModel):
+    token: str
+    otp: str
+
 
 # ==========================================
 # Token Schemas

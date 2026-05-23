@@ -2,13 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, 
 from sqlalchemy.orm import Session
 import httpx
 import smtplib
+import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.config import settings
 from app.database import get_db
 from app.crud import crud
 from datetime import timedelta
-from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin, ForgotPasswordRequest, ResetPasswordRequest
+from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin, ForgotPasswordRequest, ResetPasswordRequest, VerifyOTPRequest
 from app.utils.security import verify_password, create_access_token, decode_access_token, hash_password
 from app.dependencies import get_current_user
 from app.models.models import User
@@ -265,62 +266,86 @@ def forgot_password(
     db: Session = Depends(get_db)
 ):
     """
-    Simulate or trigger real forgot password reset email.
+    Generate OTP code and send it via Resend or SMTP, returning a verification token.
     """
     user = crud.get_user_by_email(db, email=forgot_in.email)
-    reset_token_out = None
+    otp_verify_token = None
+    otp_code = None
     if user:
-        # Create reset token (expires in 15 minutes)
-        reset_token = create_access_token(
-            data={"sub": user.id, "email": user.email, "type": "reset"},
-            expires_delta=timedelta(minutes=15)
+        # Generate random 6-digit OTP
+        otp_code = f"{random.randint(100000, 999999)}"
+        otp_hash = hash_password(otp_code)
+        
+        # Create OTP verify token (expires in 10 minutes)
+        otp_verify_token = create_access_token(
+            data={"sub": user.id, "email": user.email, "otp_hash": otp_hash, "type": "otp_verify"},
+            expires_delta=timedelta(minutes=10)
         )
-        reset_token_out = reset_token
         
-        # Determine client origin dynamically
-        client_origin = request.headers.get("origin")
-        if not client_origin:
-            client_origin = request.headers.get("referer")
-        
-        if client_origin:
-            if client_origin.endswith("/"):
-                client_origin = client_origin[:-1]
-            if "/login" in client_origin:
-                client_origin = client_origin.split("/login")[0]
-            if "/reset-password" in client_origin:
-                client_origin = client_origin.split("/reset-password")[0]
-        else:
-            client_origin = "http://localhost:3000"
-            
-        reset_link = f"{client_origin}/reset-password?token={reset_token}"
-        email_body = f"Hello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email."
+        email_body = f"Hello {user.full_name or 'User'},\n\nYour one-time password (OTP) to reset your password is:\n\n{otp_code}\n\nThis code will expire in 10 minutes.\nIf you did not request this, you can ignore this email."
         
         # Trigger real email in background if Resend or SMTP is configured
         if settings.RESEND_API_KEY:
             background_tasks.add_task(
                 send_resend_email,
                 user.email,
-                "SecureDoc Copilot - Reset Your Password Request",
+                "SecureDoc Copilot - Password Reset OTP",
                 email_body
             )
         elif settings.SMTP_HOST:
             background_tasks.add_task(
                 send_smtp_email,
                 user.email,
-                "SecureDoc Copilot - Reset Your Password Request",
+                "SecureDoc Copilot - Password Reset OTP",
                 email_body
             )
         
         print("\n" + "="*60)
-        print("SIMULATED PASSWORD RESET EMAIL SENDER")
+        print("SIMULATED PASSWORD RESET OTP SENDER")
         print(f"TO:      {user.email}")
-        print(f"SUBJECT: SecureDoc Copilot - Reset Your Password Request")
-        print(f"CONTENT:\n{email_body}")
+        print(f"SUBJECT: SecureDoc Copilot - Password Reset OTP")
+        print(f"OTP:     {otp_code}")
         print("="*60 + "\n")
         
     return {
-        "detail": "If the email is associated with a secure account, a reset link will be sent shortly.",
-        "reset_token": reset_token_out
+        "detail": "If the email is associated with a secure account, an OTP code will be sent shortly.",
+        "otp_verify_token": otp_verify_token,
+        "sandbox_otp": otp_code
+    }
+
+@router.post("/verify-otp")
+def verify_otp(verify_in: VerifyOTPRequest, db: Session = Depends(get_db)):
+    """
+    Verify the user-provided 6-digit OTP and return a reset token.
+    """
+    payload = decode_access_token(verify_in.token)
+    if not payload:
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP verification token.")
+    
+    user_id = payload.get("sub")
+    otp_hash = payload.get("otp_hash")
+    token_type = payload.get("type")
+    
+    if not user_id or token_type != "otp_verify" or not otp_hash:
+        raise HTTPException(status_code=400, detail="Invalid token type.")
+        
+    # Verify the user-provided OTP matches the hashed OTP in the token
+    if not verify_password(verify_in.otp, otp_hash):
+        raise HTTPException(status_code=400, detail="Incorrect OTP code. Please try again.")
+        
+    user = crud.get_user_by_id(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+        
+    # Generate the final short-lived reset token (expires in 5 minutes)
+    reset_token = create_access_token(
+        data={"sub": user.id, "email": user.email, "type": "reset"},
+        expires_delta=timedelta(minutes=5)
+    )
+    
+    return {
+        "detail": "OTP verified successfully.",
+        "reset_token": reset_token
     }
 
 @router.post("/reset-password")
