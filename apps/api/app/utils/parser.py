@@ -3,6 +3,8 @@ import csv
 from typing import List, Dict, Any, Optional
 import pypdf
 import docx
+from pdf2image import convert_from_bytes
+import pytesseract
 
 def split_text_recursive(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[str]:
     """
@@ -72,20 +74,51 @@ def split_text_recursive(text: str, chunk_size: int = 1000, chunk_overlap: int =
     return _split(text, separators)
 
 
+def extract_text_via_ocr(file_bytes: bytes, page_number: int) -> Optional[str]:
+    """
+    Convert a specific page of a PDF into an image and extract text using pytesseract OCR.
+    """
+    try:
+        images = convert_from_bytes(
+            file_bytes,
+            first_page=page_number,
+            last_page=page_number,
+            fmt="png",
+            thread_count=2
+        )
+        if images:
+            image = images[0]
+            text = pytesseract.image_to_string(image)
+            return text
+    except Exception as ocr_err:
+        print(f"OCR fallback failed for page {page_number}: {ocr_err}")
+    return None
+
+
 def parse_pdf(file_bytes: bytes) -> List[Dict[str, Any]]:
     """
-    Parses a PDF file page by page and chunks each page.
+    Parses a PDF file page by page and chunks each page. Falls back to OCR for image-based pages.
     """
     try:
         reader = pypdf.PdfReader(io.BytesIO(file_bytes))
         chunks = []
         for page_idx, page in enumerate(reader.pages):
+            page_num = page_idx + 1
             try:
                 text = page.extract_text()
             except Exception as page_err:
-                print(f"Error extracting text from page {page_idx + 1}: {page_err}")
+                print(f"Error extracting text from page {page_num}: {page_err}")
                 text = None
                 
+            # If extracted text is empty or very short, it could be a scanned image
+            # Let's run OCR to extract text from the image
+            if not text or len(text.strip()) < 10:
+                print(f"No clear text extracted from page {page_num}. Attempting OCR...")
+                ocr_text = extract_text_via_ocr(file_bytes, page_num)
+                if ocr_text and len(ocr_text.strip()) >= 10:
+                    print(f"OCR successfully extracted {len(ocr_text)} characters from page {page_num}!")
+                    text = ocr_text
+            
             if not text:
                 continue
             
@@ -94,7 +127,7 @@ def parse_pdf(file_bytes: bytes) -> List[Dict[str, Any]]:
             for chunk_text in page_chunks:
                 chunks.append({
                     "content": chunk_text,
-                    "page_number": page_idx + 1,
+                    "page_number": page_num,
                     "token_count": len(chunk_text) // 4
                 })
         
