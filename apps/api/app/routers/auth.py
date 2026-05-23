@@ -4,8 +4,9 @@ import httpx
 from app.config import settings
 from app.database import get_db
 from app.crud import crud
-from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin
-from app.utils.security import verify_password, create_access_token
+from datetime import timedelta
+from app.schemas.schemas import UserCreate, UserLogin, UserResponse, Token, GitHubOAuthLogin, GoogleOAuthLogin, ForgotPasswordRequest, ResetPasswordRequest
+from app.utils.security import verify_password, create_access_token, decode_access_token, hash_password
 from app.dependencies import get_current_user
 from app.models.models import User
 
@@ -185,3 +186,52 @@ async def google_login(login_data: GoogleOAuthLogin, db: Session = Depends(get_d
         "access_token": jwt_token,
         "token_type": "bearer"
     }
+
+@router.post("/forgot-password")
+def forgot_password(forgot_in: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Simulate forgot password reset email trigger.
+    """
+    user = crud.get_user_by_email(db, email=forgot_in.email)
+    if user:
+        # Create reset token (expires in 15 minutes)
+        reset_token = create_access_token(
+            data={"sub": user.id, "email": user.email, "type": "reset"},
+            expires_delta=timedelta(minutes=15)
+        )
+        reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
+        
+        print("\n" + "="*60)
+        print("SIMULATED PASSWORD RESET EMAIL SENDER")
+        print(f"TO:      {user.email}")
+        print(f"SUBJECT: SecureDoc Copilot - Reset Your Password Request")
+        print(f"CONTENT:\nHello {user.full_name or 'User'},\n\nYou requested to reset your password. Please click the link below to set a new password:\n\n{reset_link}\n\nThis link will expire in 15 minutes.\nIf you did not request this, you can ignore this email.")
+        print("="*60 + "\n")
+        
+    return {"detail": "If the email is associated with a secure account, you will receive a reset link shortly."}
+
+@router.post("/reset-password")
+def reset_password(reset_in: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Reset user password using the reset token.
+    """
+    payload = decode_access_token(reset_in.token)
+    if not payload:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token.")
+    
+    user_id = payload.get("sub")
+    token_type = payload.get("type")
+    if not user_id or token_type != "reset":
+        raise HTTPException(status_code=400, detail="Invalid token type.")
+        
+    user = crud.get_user_by_id(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+        
+    # Update password using new hashed password
+    user.hashed_password = hash_password(reset_in.new_password)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    return {"detail": "Your password has been successfully reset. Please log in with your new credentials."}

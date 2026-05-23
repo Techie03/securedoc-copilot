@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
 import { Shield, Mail, Lock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 
 import { Suspense } from 'react';
@@ -20,6 +21,31 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const processedRef = React.useRef(false);
+
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+  const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) {
+      setForgotError('Please enter your email address.');
+      return;
+    }
+    setForgotLoading(true);
+    setForgotError(null);
+    setForgotSuccess(null);
+    try {
+      const res = await api.forgotPassword(forgotEmail);
+      setForgotSuccess(res.detail || 'Password reset link sent successfully! Check server logs to see the simulated email.');
+    } catch (err: any) {
+      setForgotError(err.detail || 'Failed to submit reset request.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   React.useEffect(() => {
     const code = searchParams.get('code');
@@ -113,6 +139,113 @@ function LoginContent() {
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   };
 
+  if (showForgotPassword) {
+    return (
+      <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+        {/* Background Cyberpunk Elements */}
+        <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 -z-20" />
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl -z-10" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -z-10" />
+        
+        {/* Decorative Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-70 dark:opacity-30 -z-10" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="w-full max-w-md"
+        >
+          <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 bg-white/80 dark:border-white/5 dark:bg-slate-900/60 p-8 shadow-2xl backdrop-blur-xl">
+            <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-500 to-violet-500" />
+
+            <div className="flex flex-col items-center mb-8 text-center">
+              <motion.div
+                whileHover={{ rotate: -360 }}
+                transition={{ duration: 0.8 }}
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1.5px] shadow-lg shadow-cyan-500/20"
+              >
+                <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-slate-50 dark:bg-slate-950">
+                  <Shield className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
+                </div>
+              </motion.div>
+              <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Reset Access Key
+              </h2>
+              <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+                Enter your secure email to receive a password reset link.
+              </p>
+            </div>
+
+            {forgotSuccess ? (
+              <div className="space-y-6">
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-650 dark:text-emerald-450 text-center leading-relaxed">
+                  {forgotSuccess}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setForgotSuccess(null);
+                  }}
+                  className="w-full flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg cursor-pointer"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            ) : (
+              <form className="space-y-5" onSubmit={handleForgotPasswordSubmit}>
+                {forgotError && (
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-450">
+                    {forgotError}
+                  </div>
+                )}
+                <div>
+                  <label htmlFor="forgot-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <Mail className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                    </div>
+                    <input
+                      id="forgot-email"
+                      type="email"
+                      required
+                      placeholder="name@company.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      autoComplete="off"
+                      className="block w-full rounded-xl border border-gray-200 bg-white/60 dark:border-white/5 dark:bg-slate-950/40 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:bg-white dark:focus:bg-slate-950/80 focus:ring-cyan-500/30"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-violet-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg disabled:opacity-50 cursor-pointer"
+                >
+                  {forgotLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Reset Link"}
+                </button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+                  >
+                    Cancel and Go Back
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Cyberpunk Elements */}
@@ -180,6 +313,7 @@ function LoginContent() {
                   placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="off"
                   className="block w-full rounded-xl border border-gray-200 bg-white/60 dark:border-white/5 dark:bg-slate-950/40 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:bg-white dark:focus:bg-slate-950/80 focus:ring-cyan-500/30"
                 />
               </div>
@@ -190,6 +324,13 @@ function LoginContent() {
                 <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Password
                 </label>
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-xs font-semibold text-cyan-600 hover:text-cyan-500 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors cursor-pointer"
+                >
+                  Forgot Password?
+                </button>
               </div>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -202,6 +343,7 @@ function LoginContent() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                   className="block w-full rounded-xl border border-gray-200 bg-white/60 dark:border-white/5 dark:bg-slate-950/40 py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:bg-white dark:focus:bg-slate-950/80 focus:ring-cyan-500/30"
                 />
               </div>

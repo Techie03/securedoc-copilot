@@ -452,6 +452,20 @@ export const api = {
     });
   },
 
+  async forgotPassword(email: string): Promise<{ detail: string }> {
+    return request<{ detail: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async resetPassword(data: any): Promise<{ detail: string }> {
+    return request<{ detail: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
   // Health
   async getHealth(): Promise<{ status: string; service: string }> {
     const response = await fetch(`${API_BASE_URL.replace('/api', '')}/health`);
