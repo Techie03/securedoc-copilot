@@ -8,6 +8,8 @@ SecureDoc Copilot is a secure, multi-user, **NVIDIA NIM-powered** agentic RAG pl
 
 *(Here is a walkthrough of the SecureDoc Copilot interface)*
 
+https://github.com/user-attachments/assets/63005eb6-0282-4944-b7e6-89ece03d411c
+
 ![SecureDoc Copilot Demo](./demo.gif)
 
 ---
