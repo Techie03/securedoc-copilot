@@ -208,7 +208,7 @@ export default function Header() {
           <div className="flex items-center gap-2 sm:gap-4">
             
             {/* GitHub Action Buttons (Desktop only) */}
-            <nav className="hidden lg:flex items-center gap-3">
+            <nav className="hidden xl:flex items-center gap-3">
               <motion.a
                 href="https://github.com/Techie03/securedoc-copilot"
                 target="_blank"
@@ -237,7 +237,7 @@ export default function Header() {
             </nav>
 
             {/* Vertical Divider (Desktop Only) */}
-            <span className="hidden lg:block h-6 w-[1px] bg-gray-200 dark:bg-white/10" />
+            <span className="hidden xl:block h-6 w-[1px] bg-gray-200 dark:bg-white/10" />
 
             {/* User Login/Signup or User Profile menu */}
             {mounted && (

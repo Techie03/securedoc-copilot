@@ -35,6 +35,7 @@ export default function DocumentLibrary() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [dragActive, setDragActive] = useState(false);
+  const [stagedFiles, setStagedFiles] = useState<File[]>([]);
   
   // Delete confirm state
   const [deleteTarget, setDeleteTarget] = useState<DocumentResponse | null>(null);
@@ -90,42 +91,54 @@ export default function DocumentLibrary() {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      await handleFilesUpload(e.dataTransfer.files);
+      handleStageFiles(e.dataTransfer.files);
     }
   };
 
-  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      await handleFilesUpload(e.target.files);
+      handleStageFiles(e.target.files);
     }
+  };
+
+  // Stage files validation logic
+  const handleStageFiles = (files: FileList) => {
+    setError(null);
+    const allowedExts = ['pdf', 'docx', 'doc', 'csv', 'xlsx', 'txt', 'md'];
+    const newStaged: File[] = [...stagedFiles];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (!ext || !allowedExts.includes(ext)) {
+        setError(`Unsupported file type: .${ext}. Supported: PDF, DOCX, CSV, TXT, MD`);
+        continue;
+      }
+      if (!newStaged.some(f => f.name === file.name && f.size === file.size)) {
+        newStaged.push(file);
+      }
+    }
+    setStagedFiles(newStaged);
   };
 
   // Upload files logic
-  const handleFilesUpload = async (files: FileList) => {
-    if (!currentWorkspace) return;
+  const handleFilesUpload = async () => {
+    if (!currentWorkspace || stagedFiles.length === 0) return;
     
     setUploading(true);
     setUploadProgress(10);
     setError(null);
     
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        // Allowed formats
-        const allowedExts = ['pdf', 'docx', 'doc', 'csv', 'xlsx', 'txt', 'md'];
-        const ext = file.name.split('.').pop()?.toLowerCase();
-        if (!ext || !allowedExts.includes(ext)) {
-          throw new Error(`Unsupported file type: .${ext}. Supported: PDF, DOCX, CSV, TXT, MD`);
-        }
-
-        setUploadProgress(30 + (i / files.length) * 40);
+      for (let i = 0; i < stagedFiles.length; i++) {
+        const file = stagedFiles[i];
+        setUploadProgress(30 + (i / stagedFiles.length) * 40);
         await api.uploadDocument(currentWorkspace.id, file);
       }
       
@@ -133,6 +146,7 @@ export default function DocumentLibrary() {
       setTimeout(() => {
         setUploading(false);
         setUploadProgress(0);
+        setStagedFiles([]);
         fetchDocuments();
       }, 500);
 
@@ -217,7 +231,7 @@ export default function DocumentLibrary() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
               <Database className="h-7 w-7 text-blue-600 dark:text-blue-400" />
-              <span>Document Library</span>
+              <span>Ingested Documents</span>
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
               Upload, parse, chunk, and index PDFs, Word files, and CSV spreadsheets securely.
@@ -389,6 +403,50 @@ export default function DocumentLibrary() {
                   )}
                 </div>
 
+                {/* Staged Files List */}
+                {stagedFiles.length > 0 && !uploading && (
+                  <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/30 p-4 backdrop-blur-md space-y-3 flex flex-col transition-all duration-300">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Staged Files ({stagedFiles.length})</span>
+                      <button 
+                        onClick={() => setStagedFiles([])} 
+                        className="text-[10px] font-semibold text-rose-500 hover:text-rose-600 cursor-pointer"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                    
+                    <div className="max-h-[160px] overflow-y-auto space-y-2 pr-1">
+                      {stagedFiles.map((file, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-slate-100/50 dark:bg-white/5 p-2 rounded-xl border border-slate-200 dark:border-white/5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-slate-800 dark:text-slate-250 truncate max-w-[150px]">{file.name}</p>
+                              <p className="text-[10px] text-slate-500">{(file.size / 1024).toFixed(1)} KB</p>
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={() => setStagedFiles(prev => prev.filter((_, i) => i !== idx))}
+                            className="text-slate-450 hover:text-rose-500 p-1 cursor-pointer transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={handleFilesUpload}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:shadow-cyan-500/10 cursor-pointer transition-all duration-300 animate-pulse"
+                    >
+                      <UploadCloud className="h-4 w-4" />
+                      <span>Submit Ingestion</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-4 backdrop-blur-md text-xs text-slate-600 dark:text-slate-400 space-y-2">
                   <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
                     <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -406,7 +464,7 @@ export default function DocumentLibrary() {
               {/* Right Column: Files List Table */}
               <div className="lg:col-span-2 flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Document Library ({filteredDocs.length})</h3>
+                  <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ingested Documents ({filteredDocs.length})</h3>
                   
                   {/* Search bar */}
                   <div className="relative w-full sm:max-w-xs">
@@ -426,14 +484,14 @@ export default function DocumentLibrary() {
                   {loading ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8">
                       <Loader2 className="h-8 w-8 animate-spin text-blue-500 dark:text-blue-400" />
-                      <p className="mt-3 text-xs text-slate-650 dark:text-slate-400">Loading library files...</p>
+                      <p className="mt-3 text-xs text-slate-650 dark:text-slate-400">Loading ingested documents...</p>
                     </div>
                   ) : filteredDocs.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
                       <FileText className="h-12 w-12 text-slate-400 dark:text-slate-700 mb-3" />
                       <h4 className="text-sm font-semibold text-slate-900 dark:text-white">No documents found</h4>
                       <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mt-1">
-                        {searchQuery ? 'No documents match your search query.' : 'Upload files using the sandbox to start build your knowledge base.'}
+                        {searchQuery ? 'No documents match your search query.' : 'Upload files using the sandbox to ingest documents.'}
                       </p>
                     </div>
                   ) : (

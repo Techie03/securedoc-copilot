@@ -27,7 +27,7 @@ const navigationGrid = [
   { title: 'Agent RAG Chat', href: '/chat', desc: 'Secure document-grounded AI search and multi-route assistant.', icon: MessageSquare, color: 'hover:border-violet-500/40 text-violet-500 bg-violet-500/10' },
   { title: 'Knowledge Graph', href: '/graph', desc: 'Explore extracted entity-relationship triples visually.', icon: Network, color: 'hover:border-indigo-500/40 text-indigo-500 bg-indigo-500/10' },
   { title: 'Data Connectors', href: '/connectors', desc: 'Connect GitHub, Google Drive, and other external data sources.', icon: LinkIcon, color: 'hover:border-emerald-500/40 text-emerald-500 bg-emerald-500/10' },
-  { title: 'Document Library', href: '/documents', desc: 'Upload, parse, chunk, and index PDFs, DOCX, CSVs into Qdrant.', icon: Database, color: 'hover:border-blue-500/40 text-blue-500 bg-blue-500/10' },
+  { title: 'Ingested Documents', href: '/documents', desc: 'Upload, parse, chunk, and index PDFs, DOCX, CSVs into Qdrant.', icon: Database, color: 'hover:border-blue-500/40 text-blue-500 bg-blue-500/10' },
   { title: 'Memory Manager', href: '/memory', desc: 'Edit or disable user-level and workspace-level semantic memory.', icon: Brain, color: 'hover:border-cyan-500/40 text-cyan-500 bg-cyan-500/10' },
   { title: 'Evaluation Analytics', href: '/evaluations', desc: 'Inspect citation correctness, faithfulness scores, and model latency.', icon: BarChart2, color: 'hover:border-pink-500/40 text-pink-500 bg-pink-500/10' },
 ];

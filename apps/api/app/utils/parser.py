@@ -80,7 +80,12 @@ def parse_pdf(file_bytes: bytes) -> List[Dict[str, Any]]:
         reader = pypdf.PdfReader(io.BytesIO(file_bytes))
         chunks = []
         for page_idx, page in enumerate(reader.pages):
-            text = page.extract_text()
+            try:
+                text = page.extract_text()
+            except Exception as page_err:
+                print(f"Error extracting text from page {page_idx + 1}: {page_err}")
+                text = None
+                
             if not text:
                 continue
             
@@ -92,10 +97,32 @@ def parse_pdf(file_bytes: bytes) -> List[Dict[str, Any]]:
                     "page_number": page_idx + 1,
                     "token_count": len(chunk_text) // 4
                 })
+        
+        # Fallback if no text could be extracted from any pages
+        if not chunks:
+            metadata_str = ""
+            try:
+                if reader.metadata:
+                    metadata_str = ", ".join([f"{k}: {v}" for k, v in reader.metadata.items() if v])
+            except:
+                pass
+            fallback_text = f"PDF Metadata: {metadata_str}\n[This document contains no extractable text. It may be scanned, image-only, or encrypted.]"
+            chunks.append({
+                "content": fallback_text,
+                "page_number": 1,
+                "token_count": len(fallback_text) // 4
+            })
+            
         return chunks
     except Exception as e:
         print(f"Error parsing PDF: {e}")
-        raise ValueError(f"Failed to parse PDF document: {str(e)}")
+        # If it completely failed to read the document structure, create a fallback chunk
+        fallback_text = f"Failed to parse PDF document structure. Error details: {str(e)}"
+        return [{
+            "content": fallback_text,
+            "page_number": 1,
+            "token_count": len(fallback_text) // 4
+        }]
 
 
 def parse_docx(file_bytes: bytes) -> List[Dict[str, Any]]:

@@ -24,7 +24,11 @@ async def process_document_background(
         # 1. Parse text from bytes
         chunks_data = parse_document(file_bytes, filename)
         if not chunks_data:
-            raise ValueError("No text content could be extracted from document.")
+            chunks_data = [{
+                "content": f"Document: {filename}\n[This document contains no extractable text.]",
+                "page_number": 1,
+                "token_count": len(filename) // 4 + 10
+            }]
         
         # 2. Get embeddings from NVIDIA NIM
         client = NvidiaNIMClient()
