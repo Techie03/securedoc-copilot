@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # NVIDIA NIM Configurations
-    NVIDIA_API_KEY: str
+    NVIDIA_API_KEY: str = ""
     NVIDIA_BASE_URL: str = "https://integrate.api.nvidia.com/v1"
     NVIDIA_LLM_MODEL: str = "meta/llama-3.3-70b-instruct"
     NVIDIA_EMBEDDING_MODEL: str = "nvidia/nv-embedqa-e5-v5"
