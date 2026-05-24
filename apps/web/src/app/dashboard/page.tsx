@@ -113,7 +113,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="overflow-hidden rounded-2xl border border-gray-200 dark:border-white/5 bg-white dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm"
+                className="overflow-hidden rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/70 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{stat.label}</span>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                     <Link
                       key={idx}
                       href={item.href}
-                      className={`group flex items-start gap-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-300 dark:hover:border-white/10`}
+                      className={`group flex items-start gap-4 rounded-2xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-350 hover:bg-white/95 dark:hover:bg-slate-900/45 dark:hover:border-white/10 shadow-sm shadow-slate-100/30 dark:shadow-none hover:shadow-md`}
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 group-hover:bg-gradient-to-tr group-hover:from-cyan-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-300">
                         <Icon className="h-5 w-5" />
@@ -164,7 +164,7 @@ export default function Dashboard() {
             {/* Workspaces List */}
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Workspaces</h2>
-              <div className="mt-4 overflow-hidden rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/30 backdrop-blur-md">
+              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/80 dark:bg-slate-900/30 backdrop-blur-md shadow-sm">
                 <div className="divide-y divide-gray-150 dark:divide-white/5">
                   {workspaces.map((ws) => (
                     <div 
@@ -221,7 +221,7 @@ export default function Dashboard() {
           {/* Right Col: Operations Telemetry */}
           <div className="flex flex-col gap-6">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Diagnostics</h2>
-            <div className="rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 p-5 backdrop-blur-md">
+              <div className="rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/80 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm">
               <div className="flex items-center gap-2">
                 <CircleDollarSign className="h-4 w-4 text-emerald-500 dark:text-emerald-400 animate-pulse" />
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Cost & Token Ingestion</h3>
@@ -252,7 +252,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-gray-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 p-5 backdrop-blur-md">
+            <div className="rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/80 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">Active NIM Model Nodes</h3>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between text-xs">

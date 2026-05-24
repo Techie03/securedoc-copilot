@@ -337,22 +337,22 @@ export default function ChatPage() {
 
   const getUserBubbleClass = () => {
     if (platform === 'ios') {
-      return 'bg-gradient-to-tr from-blue-650 to-indigo-650 text-white rounded-3xl rounded-tr-sm border-transparent shadow-sm';
+      return 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-3xl rounded-tr-sm border-transparent shadow-sm';
     }
     if (platform === 'android') {
       return 'bg-cyan-600 dark:bg-cyan-700 text-white rounded-2xl rounded-tr-none border-transparent shadow-md';
     }
-    return 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-white/5 rounded-tr-none text-slate-800 dark:text-slate-100 shadow-sm';
+    return 'bg-gradient-to-tr from-violet-500/10 to-cyan-500/10 dark:from-slate-900 dark:to-slate-900 border-violet-500/15 dark:border-white/5 rounded-tr-none text-slate-800 dark:text-slate-100 shadow-sm';
   };
 
   const getAssistantBubbleClass = () => {
     if (platform === 'ios') {
-      return 'bg-slate-100/90 dark:bg-slate-900/60 border-slate-200 dark:border-white/5 rounded-3xl rounded-tl-sm text-slate-800 dark:text-slate-200 backdrop-blur-md';
+      return 'bg-white/90 dark:bg-slate-900/60 border-slate-200/50 dark:border-white/5 rounded-3xl rounded-tl-sm text-slate-700 dark:text-slate-200 backdrop-blur-md';
     }
     if (platform === 'android') {
       return 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 rounded-2xl rounded-tl-none text-slate-700 dark:text-slate-200 shadow-sm';
     }
-    return 'bg-white/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-white/5 rounded-tl-none text-slate-700 dark:text-slate-200 backdrop-blur-sm';
+    return 'bg-white/85 dark:bg-slate-900/40 border-slate-200/50 dark:border-white/5 rounded-tl-none text-slate-700 dark:text-slate-200 backdrop-blur-sm shadow-sm';
   };
 
   return (
@@ -375,7 +375,7 @@ export default function ChatPage() {
       </AnimatePresence>
 
       {/* 1. SESSIONS SIDEBAR */}
-      <div className={`w-80 border-r border-gray-200 dark:border-white/5 bg-white dark:bg-slate-950 lg:bg-white/70 lg:dark:bg-slate-900/20 lg:backdrop-blur-xl flex flex-col shrink-0 transition-transform duration-300 fixed inset-y-0 left-0 z-50 lg:static lg:translate-x-0 ${
+      <div className={`w-80 border-r border-slate-200/60 dark:border-white/5 bg-white/70 dark:bg-slate-950 lg:bg-white/50 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl flex flex-col shrink-0 transition-transform duration-300 fixed inset-y-0 left-0 z-50 lg:static lg:translate-x-0 ${
         mobileSessionsOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Mobile Header for Sidebar Drawer */}
@@ -750,7 +750,7 @@ export default function ChatPage() {
       </AnimatePresence>
 
       <div
-        className={`border-l border-gray-200 dark:border-white/5 bg-white dark:bg-slate-955 lg:bg-slate-900/20 lg:backdrop-blur-xl flex flex-col shrink-0 transition-all duration-300 overflow-hidden
+        className={`border-l border-slate-200/60 dark:border-white/5 bg-white/75 dark:bg-slate-950 lg:bg-white/50 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl flex flex-col shrink-0 transition-all duration-300 overflow-hidden
           fixed inset-y-0 right-0 z-50 w-80 max-w-[calc(100vw-3rem)] lg:static lg:w-[380px] lg:translate-x-0 ${
             showTelemetry ? 'translate-x-0 opacity-100 lg:w-[380px]' : 'translate-x-full opacity-0 lg:translate-x-0 lg:w-0 lg:border-l-0 lg:opacity-100'
           }`}
