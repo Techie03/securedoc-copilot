@@ -375,7 +375,7 @@ export default function ChatPage() {
       </AnimatePresence>
 
       {/* 1. SESSIONS SIDEBAR */}
-      <div className={`w-80 border-r border-slate-200/60 dark:border-white/5 bg-white/70 dark:bg-slate-950 lg:bg-white/50 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl flex flex-col shrink-0 transition-transform duration-300 fixed inset-y-0 left-0 z-50 lg:static lg:translate-x-0 ${
+      <div className={`w-80 border-r border-slate-200/60 dark:border-white/5 bg-white/70 dark:bg-slate-950 lg:bg-white/50 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl flex flex-col shrink-0 transition-transform duration-300 fixed inset-y-0 left-0 z-50 lg:z-0 lg:static lg:translate-x-0 ${
         mobileSessionsOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Mobile Header for Sidebar Drawer */}
@@ -751,7 +751,7 @@ export default function ChatPage() {
 
       <div
         className={`border-l border-slate-200/60 dark:border-white/5 bg-white/75 dark:bg-slate-950 lg:bg-white/50 lg:dark:bg-slate-900/10 lg:backdrop-blur-xl flex flex-col shrink-0 transition-all duration-300 overflow-hidden
-          fixed inset-y-0 right-0 z-50 w-80 max-w-[calc(100vw-3rem)] lg:static lg:w-[380px] lg:translate-x-0 ${
+          fixed inset-y-0 right-0 z-50 lg:z-0 w-80 max-w-[calc(100vw-3rem)] lg:static lg:w-[380px] lg:translate-x-0 ${
             showTelemetry ? 'translate-x-0 opacity-100 lg:w-[380px]' : 'translate-x-full opacity-0 lg:translate-x-0 lg:w-0 lg:border-l-0 lg:opacity-100'
           }`}
       >
