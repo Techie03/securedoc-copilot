@@ -212,7 +212,7 @@ export default function DocumentLibrary() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Verifying authorization...</p>
       </div>
@@ -220,7 +220,7 @@ export default function DocumentLibrary() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col transition-colors duration-300">
       {/* Background glow effects */}
       <div className="absolute top-10 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-600/5 rounded-full blur-3xl -z-10" />

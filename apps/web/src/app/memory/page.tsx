@@ -112,7 +112,7 @@ export default function MemoryPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-955 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
         <p className="mt-4 text-sm text-slate-655 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
@@ -121,7 +121,7 @@ export default function MemoryPage() {
 
   if (!currentWorkspace) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -140,7 +140,7 @@ export default function MemoryPage() {
   }
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
+    <div className="flex-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
       {/* Ambient background glows */}
       <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-violet-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />
@@ -217,7 +217,7 @@ export default function MemoryPage() {
                     placeholder="e.g. Preferred Language, Coding Style"
                     value={newKey}
                     onChange={(e) => setNewKey(e.target.value)}
-                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-950/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35"
+                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-955/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35"
                   />
                 </div>
 
@@ -232,7 +232,7 @@ export default function MemoryPage() {
                     placeholder="e.g. Always write Python codes with clean docstrings and typing annotations."
                     value={newValue}
                     onChange={(e) => setNewValue(e.target.value)}
-                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-950/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35 resize-none"
+                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-950/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35 resize-none"
                   />
                 </div>
 
@@ -329,7 +329,7 @@ export default function MemoryPage() {
               </div>
             ) : filteredMemories.length === 0 ? (
               <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/10 p-12 text-center backdrop-blur-sm">
-                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto mb-4">
+                <div className="h-12 w-12 rounded-xl bg-white/80 dark:bg-white/5 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto mb-4">
                   <Database className="h-6 w-6" />
                 </div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">No Memories Found</h3>

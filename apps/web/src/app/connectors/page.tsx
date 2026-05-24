@@ -107,14 +107,14 @@ export default function ConnectorsPage() {
 
   if (authLoading || (!currentWorkspace && !loading)) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-955 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-500 dark:text-emerald-400" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 w-full flex flex-col transition-colors duration-300">
       {/* Background glow */}
       <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
 
@@ -151,7 +151,7 @@ export default function ConnectorsPage() {
               onClick={() => setShowGithubModal(true)}
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 group-hover:dark:text-emerald-400 group-hover:bg-emerald-500/10 transition-colors">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/85 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 group-hover:dark:text-emerald-400 group-hover:bg-emerald-500/10 transition-colors">
                   <Github className="h-6 w-6" />
                 </div>
                 <div>
@@ -169,7 +169,7 @@ export default function ConnectorsPage() {
               onClick={handleCreateGdrive}
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-blue-600 group-hover:dark:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/85 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-blue-600 group-hover:dark:text-blue-400 group-hover:bg-blue-500/10 transition-colors">
                   <HardDrive className="h-6 w-6" />
                 </div>
                 <div>
@@ -263,7 +263,7 @@ export default function ConnectorsPage() {
                   {conn.latest_sync?.logs && (
                     <div className="mt-4 pt-4 border-t border-slate-200 dark:border-white/5">
                       <p className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider mb-2">Latest Sync Logs</p>
-                      <div className="bg-slate-100 dark:bg-slate-950 rounded-lg p-3 overflow-x-auto border border-slate-200/50 dark:border-none">
+                      <div className="bg-white/80 dark:bg-slate-950 rounded-lg p-3 overflow-x-auto border border-slate-200/50 dark:border-none">
                         <pre className="text-[10px] text-slate-705 dark:text-slate-405 font-mono whitespace-pre-wrap">{conn.latest_sync.logs}</pre>
                       </div>
                     </div>
@@ -321,7 +321,7 @@ export default function ConnectorsPage() {
                       value={githubOwner}
                       onChange={e => setGithubOwner(e.target.value)}
                       placeholder="e.g. vercel"
-                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                     />
                   </div>
                   <div>
@@ -331,7 +331,7 @@ export default function ConnectorsPage() {
                       value={githubRepo}
                       onChange={e => setGithubRepo(e.target.value)}
                       placeholder="e.g. next.js"
-                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export default function ConnectorsPage() {
                     value={githubBranch}
                     onChange={e => setGithubBranch(e.target.value)}
                     placeholder="main"
-                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -351,7 +351,7 @@ export default function ConnectorsPage() {
                     value={githubToken}
                     onChange={e => setGithubToken(e.target.value)}
                     placeholder="ghp_..."
-                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                   />
                   <p className="text-[10px] text-slate-500 dark:text-slate-550 mt-1">Required only for private repositories.</p>
                 </div>

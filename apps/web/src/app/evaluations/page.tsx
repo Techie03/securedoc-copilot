@@ -124,8 +124,8 @@ export default function EvaluationsPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-55 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
-        <Loader2 className="h-8 w-8 animate-spin text-cyan-555 dark:text-cyan-400" />
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
         <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
     );
@@ -133,9 +133,9 @@ export default function EvaluationsPage() {
 
   if (!currentWorkspace) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-955 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.955 }}
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md w-full border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 rounded-3xl p-8 text-center backdrop-blur-md shadow-lg"
         >
@@ -152,7 +152,7 @@ export default function EvaluationsPage() {
   }
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
+    <div className="flex-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
       {/* Ambient background glows */}
       <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-violet-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />
@@ -432,23 +432,23 @@ export default function EvaluationsPage() {
                              animate={{ height: 'auto', opacity: 1 }}
                              exit={{ height: 0, opacity: 0 }}
                              transition={{ duration: 0.2 }}
-                             className="border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/40 p-4 text-xs space-y-4"
+                             className="border-t border-slate-100 dark:border-white/5 bg-white/50 dark:bg-slate-950/40 p-4 text-xs space-y-4"
                            >
                             {/* Telemetry metadata Grid */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-white/5 p-2.5">
+                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-2.5">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Estimated Cost</span>
                                 <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm mt-0.5 block">${log.estimated_cost?.toFixed(5)}</span>
                               </div>
-                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-white/5 p-2.5">
+                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-2.5">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Total Tokens</span>
                                 <span className="text-slate-800 dark:text-slate-200 font-bold text-sm mt-0.5 block">{(log.prompt_tokens || 0) + (log.completion_tokens || 0)}</span>
                               </div>
-                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-white/5 p-2.5">
+                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-2.5">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Prompt Tokens</span>
                                 <span className="text-slate-700 dark:text-slate-300 font-semibold text-xs mt-0.5 block">{log.prompt_tokens}</span>
                               </div>
-                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-100/50 dark:bg-white/5 p-2.5">
+                              <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-2.5">
                                 <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Completion Tokens</span>
                                 <span className="text-slate-700 dark:text-slate-300 font-semibold text-xs mt-0.5 block">{log.completion_tokens}</span>
                               </div>

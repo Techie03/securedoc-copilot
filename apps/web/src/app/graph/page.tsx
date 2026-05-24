@@ -54,7 +54,7 @@ export default function GraphPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
         <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
@@ -63,7 +63,7 @@ export default function GraphPage() {
 
   if (!currentWorkspace) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] p-6 transition-colors duration-300">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] p-6 transition-colors duration-300">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -82,7 +82,7 @@ export default function GraphPage() {
   }
 
   return (
-    <div className="flex-1 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
+    <div className="flex-1 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-[calc(100vh-4rem)] py-8 px-4 sm:px-6 lg:px-8 relative transition-colors duration-300">
       {/* Ambient background glows */}
       <div className="absolute top-10 right-10 w-96 h-96 bg-cyan-500/[0.03] dark:bg-cyan-500/5 rounded-full blur-[100px] pointer-events-none -z-10" />
       <div className="absolute bottom-10 left-10 w-96 h-96 bg-violet-600/[0.03] dark:bg-violet-600/5 rounded-full blur-[100px] pointer-events-none -z-10" />

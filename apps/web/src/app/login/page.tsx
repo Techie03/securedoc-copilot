@@ -218,7 +218,7 @@ function LoginContent() {
     return (
       <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
         {/* Background Cyberpunk Elements */}
-        <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 -z-20" />
+        <div className="absolute inset-0 bg-white dark:bg-slate-950 transition-colors duration-300 -z-20" />
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -z-10" />
         
@@ -240,7 +240,7 @@ function LoginContent() {
                 transition={{ duration: 0.8 }}
                 className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1.5px] shadow-lg shadow-cyan-500/20"
               >
-                <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-slate-50 dark:bg-slate-950">
+                <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-955">
                   <Shield className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
                 </div>
               </motion.div>
@@ -505,7 +505,7 @@ function LoginContent() {
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Background Cyberpunk Elements */}
-      <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 -z-20" />
+      <div className="absolute inset-0 bg-white dark:bg-slate-950 transition-colors duration-300 -z-20" />
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -z-10" />
       
@@ -531,7 +531,7 @@ function LoginContent() {
               transition={{ duration: 0.8 }}
               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1.5px] shadow-lg shadow-cyan-500/20"
             >
-              <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-slate-50 dark:bg-slate-950">
+              <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-955">
                 <Shield className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
               </div>
             </motion.div>
@@ -671,7 +671,7 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-slate-950 min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex items-center justify-center bg-white dark:bg-slate-950 min-h-[calc(100vh-4rem)]">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
       </div>
     }>

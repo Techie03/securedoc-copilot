@@ -91,7 +91,7 @@ export default function DiagnosticsPage() {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 py-12 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100 py-12 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
       {/* Ambient Cyberpunk Glows */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-violet-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -z-10" />
@@ -102,7 +102,7 @@ export default function DiagnosticsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1px] flex items-center justify-center">
-              <div className="h-full w-full bg-slate-50 dark:bg-slate-950 rounded-[11px] flex items-center justify-center">
+              <div className="h-full w-full bg-white dark:bg-slate-955 rounded-[11px] flex items-center justify-center">
                 <Activity className="h-5 w-5 text-cyan-550 dark:text-cyan-400" />
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function DiagnosticsPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Client Origin URL
                 </label>
-                <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
                   {clientOrigin}
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function DiagnosticsPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   NEXT_PUBLIC_API_URL
                 </label>
-                <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
                   {apiBaseUrl}
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function DiagnosticsPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   GitHub Client ID
                 </label>
-                <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
                   {githubClientId}
                 </div>
               </div>
@@ -161,7 +161,7 @@ export default function DiagnosticsPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Google Client ID
                 </label>
-                <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 break-all text-slate-700 dark:text-slate-300">
                   {googleClientId}
                 </div>
               </div>
@@ -185,11 +185,11 @@ export default function DiagnosticsPage() {
                 </span>
               </div>
               <div className="space-y-4">
-                <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300 max-h-40 overflow-y-auto">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-955 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300 max-h-40 overflow-y-auto">
                   {backendHealth.detail}
                 </div>
                 {backendHealth.data && (
-                  <div className="text-xs bg-slate-50/50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-white/5">
+                  <div className="text-xs bg-white/50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200 dark:border-white/5">
                     <div className="text-slate-500 dark:text-slate-400 font-semibold mb-2">Health Report Payload:</div>
                     <pre className="font-mono text-slate-700 dark:text-slate-300">{JSON.stringify(backendHealth.data, null, 2)}</pre>
                   </div>
@@ -214,31 +214,31 @@ export default function DiagnosticsPage() {
               <div className="space-y-4">
                 {backendDiagnostics.status === 'Connected' && backendDiagnostics.data ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
+                    <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">PostgreSQL Database</div>
                       <div className={`text-sm font-semibold ${backendDiagnostics.data.database === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.database}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
+                    <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Qdrant Vector Database</div>
                       <div className={`text-sm font-semibold ${backendDiagnostics.data.qdrant === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.qdrant}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
+                    <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Redis Cache/Queue</div>
                       <div className={`text-sm font-semibold ${backendDiagnostics.data.redis === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.redis}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
+                    <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">NVIDIA NIM AI</div>
                       <div className={`text-sm font-semibold ${backendDiagnostics.data.nvidia_nim === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.nvidia_nim}
                       </div>
                     </div>
-                    <div className="sm:col-span-2 p-4 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
+                    <div className="sm:col-span-2 p-4 bg-white/80 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Backend OAuth Setup</div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function DiagnosticsPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="font-mono text-xs bg-slate-100 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-750 dark:text-slate-300">
+                  <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300">
                     {backendDiagnostics.detail}
                   </div>
                 )}

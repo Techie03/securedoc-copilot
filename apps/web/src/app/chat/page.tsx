@@ -303,7 +303,7 @@ export default function ChatPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
         <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
@@ -312,7 +312,7 @@ export default function ChatPage() {
 
   if (!currentWorkspace) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)] p-6">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -356,7 +356,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex-1 flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden w-full relative">
+    <div className="flex-1 flex bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)] overflow-hidden w-full relative">
       {/* Glow Effect */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-violet-600/5 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl -z-10" />
@@ -844,7 +844,7 @@ export default function ChatPage() {
                   {documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/50 dark:hover:bg-slate-900/50 transition-all duration-200"
+                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 hover:bg-white/70 dark:hover:bg-slate-900/50 transition-all duration-200"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {getCompactFileIcon(doc.file_type)}
@@ -866,7 +866,7 @@ export default function ChatPage() {
                   <div className="pt-2">
                     <a
                       href="/documents"
-                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/50 dark:hover:bg-slate-900/60 py-2.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 hover:bg-white/70 dark:hover:bg-slate-900/60 py-2.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-all duration-300"
                     >
                       <span>Manage Workspace Documents</span>
                       <ChevronRight className="h-3.5 w-3.5" />
@@ -886,7 +886,7 @@ export default function ChatPage() {
               
               {activeRun ? (
                 <div className="grid grid-cols-2 gap-3.5">
-                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-3">
                     <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
                       <Clock className="h-3 w-3" /> Latency
                     </div>
@@ -894,7 +894,7 @@ export default function ChatPage() {
                       {activeRun.latency_ms} ms
                     </div>
                   </div>
-                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-3">
                     <div className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
                       <CircleDollarSign className="h-3 w-3 text-emerald-500 dark:text-emerald-400" /> Cost Est.
                     </div>
@@ -902,7 +902,7 @@ export default function ChatPage() {
                       ${activeRun.estimated_cost?.toFixed(5)}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-3">
                     <div className="text-[10px] font-bold text-slate-500 uppercase">
                       Prompt Tokens
                     </div>
@@ -910,7 +910,7 @@ export default function ChatPage() {
                       {activeRun.prompt_tokens}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 p-3">
+                  <div className="rounded-xl border border-gray-200 dark:border-white/5 bg-white/80 dark:bg-white/5 p-3">
                     <div className="text-[10px] font-bold text-slate-500 uppercase">
                       Completion Tokens
                     </div>
@@ -1008,7 +1008,7 @@ export default function ChatPage() {
                   {memories.map((mem) => (
                     <div
                       key={mem.id}
-                      className="rounded-xl border border-gray-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/50 p-3 text-xs backdrop-blur-sm"
+                      className="rounded-xl border border-gray-200 dark:border-white/5 bg-white/70 dark:bg-slate-900/50 p-3 text-xs backdrop-blur-sm"
                     >
                       <div className="flex items-center justify-between font-bold text-cyan-600 dark:text-cyan-400 mb-1 text-[10px] uppercase tracking-wide">
                         <span>{mem.memory_key}</span>
