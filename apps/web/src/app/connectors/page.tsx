@@ -107,7 +107,7 @@ export default function ConnectorsPage() {
 
   if (authLoading || (!currentWorkspace && !loading)) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-955 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-500 dark:text-emerald-400" />
       </div>
     );
@@ -126,7 +126,7 @@ export default function ConnectorsPage() {
               <LinkIcon className="h-6 w-6 text-emerald-500 dark:text-emerald-400" />
               Data Connectors
             </h1>
-            <p className="text-sm text-slate-550 dark:text-slate-400 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Connect external data sources for automated ingestion, chunking, and GraphRAG extraction.
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function ConnectorsPage() {
               <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/10 p-8 text-center bg-white/30 dark:bg-slate-900/10">
                 <LinkIcon className="h-8 w-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
                 <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300">No active connectors</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-550 mt-1">Add a source above to automatically ingest data.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Add a source above to automatically ingest data.</p>
               </div>
             ) : (
               connectors.map(conn => (
@@ -212,7 +212,7 @@ export default function ConnectorsPage() {
                     <div className="flex items-center gap-4">
                       <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
                         conn.provider === 'github' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 
-                        'bg-blue-500/10 text-blue-650 dark:text-blue-400 border border-blue-500/20'
+                        'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
                       }`}>
                         {conn.provider === 'github' ? <Github className="h-6 w-6" /> : <HardDrive className="h-6 w-6" />}
                       </div>
@@ -228,7 +228,7 @@ export default function ConnectorsPage() {
                           <span>{conn.doc_count || 0} documents ingested</span>
                           {conn.latest_sync?.completed_at && (
                             <>
-                              <span className="text-slate-300 dark:text-slate-605">•</span>
+                              <span className="text-slate-300 dark:text-slate-600">•</span>
                               <span>Last sync: {new Date(conn.latest_sync.completed_at).toLocaleString()}</span>
                             </>
                           )}
@@ -242,7 +242,7 @@ export default function ConnectorsPage() {
                         <button
                           onClick={() => handleSync(conn.id)}
                           disabled={conn.status === 'syncing'}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-605 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 hover:dark:text-white transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 hover:dark:text-white transition-colors disabled:opacity-50"
                         >
                           <RefreshCw className={`h-3.5 w-3.5 ${conn.status === 'syncing' ? 'animate-spin' : ''}`} />
                           Sync
@@ -262,9 +262,9 @@ export default function ConnectorsPage() {
                   {/* Sync Logs (if error or recent) */}
                   {conn.latest_sync?.logs && (
                     <div className="mt-4 pt-4 border-t border-slate-200 dark:border-white/5">
-                      <p className="text-[10px] font-bold text-slate-450 dark:text-slate-550 uppercase tracking-wider mb-2">Latest Sync Logs</p>
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Latest Sync Logs</p>
                       <div className="bg-white/80 dark:bg-slate-950 rounded-lg p-3 overflow-x-auto border border-slate-200/50 dark:border-none">
-                        <pre className="text-[10px] text-slate-705 dark:text-slate-405 font-mono whitespace-pre-wrap">{conn.latest_sync.logs}</pre>
+                        <pre className="text-[10px] text-slate-700 dark:text-slate-400 font-mono whitespace-pre-wrap">{conn.latest_sync.logs}</pre>
                       </div>
                     </div>
                   )}
@@ -309,7 +309,7 @@ export default function ConnectorsPage() {
 
               <form onSubmit={handleCreateGithub} className="space-y-4">
                 {modalError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-605 dark:text-rose-400">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-600 dark:text-rose-400">
                     {modalError}
                   </div>
                 )}
@@ -321,7 +321,7 @@ export default function ConnectorsPage() {
                       value={githubOwner}
                       onChange={e => setGithubOwner(e.target.value)}
                       placeholder="e.g. vercel"
-                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                      className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                     />
                   </div>
                   <div>
@@ -341,7 +341,7 @@ export default function ConnectorsPage() {
                     value={githubBranch}
                     onChange={e => setGithubBranch(e.target.value)}
                     placeholder="main"
-                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -353,7 +353,7 @@ export default function ConnectorsPage() {
                     placeholder="ghp_..."
                     className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/50 p-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 outline-none transition-colors"
                   />
-                  <p className="text-[10px] text-slate-500 dark:text-slate-550 mt-1">Required only for private repositories.</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-1">Required only for private repositories.</p>
                 </div>
                 
                 <div className="flex justify-end gap-3 pt-4">

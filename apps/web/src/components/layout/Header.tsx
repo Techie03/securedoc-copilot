@@ -178,7 +178,7 @@ export default function Header() {
                           </button>
                         ))}
                       </div>
-                      <div className="border-t border-gray-150 my-1.5 dark:border-white/5" />
+                      <div className="border-t border-slate-200/50 my-1.5 dark:border-white/5" />
                       <button
                         onClick={() => {
                           setShowCreateModal(true);
@@ -283,7 +283,7 @@ export default function Header() {
                           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Signed in as</p>
                           <p className="truncate text-xs font-semibold text-slate-700 dark:text-slate-200">{user.email}</p>
                         </div>
-                        <div className="border-t border-gray-150 my-1.5 dark:border-white/5" />
+                        <div className="border-t border-slate-200/50 my-1.5 dark:border-white/5" />
                         <Link
                           href="/dashboard"
                           onClick={() => setShowUserMenu(false)}
@@ -375,9 +375,9 @@ export default function Header() {
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-5 w-5 text-gray-650 dark:text-slate-300" />
+                  <X className="h-5 w-5 text-gray-600 dark:text-slate-300" />
                 ) : (
-                  <Menu className="h-5 w-5 text-gray-650 dark:text-slate-300" />
+                  <Menu className="h-5 w-5 text-gray-600 dark:text-slate-300" />
                 )}
               </motion.button>
             )}

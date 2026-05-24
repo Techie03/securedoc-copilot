@@ -240,7 +240,7 @@ function LoginContent() {
                 transition={{ duration: 0.8 }}
                 className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1.5px] shadow-lg shadow-cyan-500/20"
               >
-                <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-955">
+                <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-950">
                   <Shield className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
                 </div>
               </motion.div>
@@ -261,7 +261,7 @@ function LoginContent() {
             {forgotStep === 'email' && (
               <form className="space-y-5" onSubmit={handleForgotPasswordSubmit}>
                 {forgotError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-450">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-400">
                     {forgotError}
                   </div>
                 )}
@@ -318,7 +318,7 @@ function LoginContent() {
                   </div>
                 )}
                 {forgotError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-450">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-400">
                     {forgotError}
                   </div>
                 )}
@@ -398,7 +398,7 @@ function LoginContent() {
             {forgotStep === 'password' && (
               <form className="space-y-5" onSubmit={handlePasswordResetSubmit}>
                 {forgotError && (
-                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-450">
+                  <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3.5 text-sm text-rose-500 dark:text-rose-400">
                     {forgotError}
                   </div>
                 )}
@@ -471,7 +471,7 @@ function LoginContent() {
 
             {forgotStep === 'success' && (
               <div className="space-y-6">
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-450 text-center leading-relaxed">
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400 text-center leading-relaxed">
                   {forgotSuccess || "Your password has been successfully reset."}
                 </div>
 
@@ -531,7 +531,7 @@ function LoginContent() {
               transition={{ duration: 0.8 }}
               className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1.5px] shadow-lg shadow-cyan-500/20"
             >
-              <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-955">
+              <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-white dark:bg-slate-950">
                 <Shield className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
               </div>
             </motion.div>

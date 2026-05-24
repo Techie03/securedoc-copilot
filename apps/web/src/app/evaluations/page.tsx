@@ -139,11 +139,11 @@ export default function EvaluationsPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-md w-full border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 rounded-3xl p-8 text-center backdrop-blur-md shadow-lg"
         >
-          <div className="h-14 w-14 rounded-2xl bg-cyan-550/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-6">
+          <div className="h-14 w-14 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-6">
             <LineChart className="h-7 w-7" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Workspace Selected</h2>
-          <p className="text-sm text-slate-655 dark:text-slate-400 mb-6 leading-relaxed">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
             Choose an active workspace environment from the header menu to examine evaluation scores and execution pipelines.
           </p>
         </motion.div>
@@ -163,7 +163,7 @@ export default function EvaluationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-              <LineChart className="h-6 w-6 text-cyan-550 dark:text-cyan-400 animate-pulse" />
+              <LineChart className="h-6 w-6 text-cyan-500 dark:text-cyan-400 animate-pulse" />
               RAG Evaluation & Telemetry Analytics
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -194,7 +194,7 @@ export default function EvaluationsPage() {
             </div>
             <div className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">{avgLatency} ms</div>
             <div className="mt-1.5 text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-              <TrendingUp className="h-3 w-3 text-cyan-550 dark:text-cyan-400" />
+              <TrendingUp className="h-3 w-3 text-cyan-500 dark:text-cyan-400" />
               <span>Calculated across {totalCount} execution logs.</span>
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function EvaluationsPage() {
             {/* Route Intent Distribution */}
             <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/20 p-6 backdrop-blur-xl space-y-4 shadow-sm">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <BarChart3 className="h-4.5 w-4.5 text-cyan-550 dark:text-cyan-400" />
+                <BarChart3 className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400" />
                 Route Intent Distribution
               </h3>
               
@@ -291,7 +291,7 @@ export default function EvaluationsPage() {
             {/* Quality Summary Info */}
             <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/20 p-6 backdrop-blur-xl space-y-4 shadow-sm">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Gauge className="h-4.5 w-4.5 text-cyan-550 dark:text-cyan-400" />
+                <Gauge className="h-4.5 w-4.5 text-cyan-500 dark:text-cyan-400" />
                 Evaluator Metrics Info
               </h3>
               
@@ -349,7 +349,7 @@ export default function EvaluationsPage() {
             {/* List of executions */}
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 space-y-3">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-550 dark:text-cyan-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
                 <p className="text-sm text-slate-500 dark:text-slate-400">Loading telemetry logs...</p>
               </div>
             ) : filteredLogs.length === 0 ? (
@@ -385,7 +385,7 @@ export default function EvaluationsPage() {
                         >
                           <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
                             {/* Route Badge icon */}
-                            <div className={`p-2 rounded-xl border shrink-0 ${ROUTE_COLORS[log.route || 'general'] || 'text-slate-655 bg-slate-100 border-slate-200 dark:text-slate-400 dark:bg-white/5 dark:border-white/5'}`}>
+                            <div className={`p-2 rounded-xl border shrink-0 ${ROUTE_COLORS[log.route || 'general'] || 'text-slate-600 bg-slate-100 border-slate-200 dark:text-slate-400 dark:bg-white/5 dark:border-white/5'}`}>
                               <RouteIcon className="h-4 w-4" />
                             </div>
                             
@@ -407,13 +407,13 @@ export default function EvaluationsPage() {
                             {hasEval && log.evaluation && (
                               <div className="hidden sm:flex items-center gap-3 text-[10px] font-bold">
                                 <div className="text-center">
-                                  <span className="text-slate-500 dark:text-slate-455 block text-[9px] font-normal uppercase">Faith</span>
+                                  <span className="text-slate-500 dark:text-slate-400 block text-[9px] font-normal uppercase">Faith</span>
                                   <span className={log.evaluation.faithfulness && log.evaluation.faithfulness >= 0.8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                     {Math.round((log.evaluation.faithfulness || 0) * 100)}%
                                   </span>
                                 </div>
                                 <div className="text-center">
-                                  <span className="text-slate-500 dark:text-slate-455 block text-[9px] font-normal uppercase">Relev</span>
+                                  <span className="text-slate-500 dark:text-slate-400 block text-[9px] font-normal uppercase">Relev</span>
                                   <span className={log.evaluation.relevance && log.evaluation.relevance >= 0.8 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
                                     {Math.round((log.evaluation.relevance || 0) * 100)}%
                                   </span>

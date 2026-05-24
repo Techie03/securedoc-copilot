@@ -80,11 +80,11 @@ export default function DiagnosticsPage() {
     switch (status) {
       case 'Healthy':
       case 'Connected':
-        return 'text-emerald-605 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10';
+        return 'text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10';
       case 'Error':
-        return 'text-rose-605 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10';
+        return 'text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10';
       case 'Checking':
-        return 'text-cyan-650 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/20 bg-cyan-50 dark:bg-cyan-500/10';
+        return 'text-cyan-600 dark:text-cyan-400 border-cyan-200 dark:border-cyan-500/20 bg-cyan-50 dark:bg-cyan-500/10';
       default:
         return 'text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/40';
     }
@@ -102,8 +102,8 @@ export default function DiagnosticsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-white/5 pb-6">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-violet-600 p-[1px] flex items-center justify-center">
-              <div className="h-full w-full bg-white dark:bg-slate-955 rounded-[11px] flex items-center justify-center">
-                <Activity className="h-5 w-5 text-cyan-550 dark:text-cyan-400" />
+              <div className="h-full w-full bg-white dark:bg-slate-950 rounded-[11px] flex items-center justify-center">
+                <Activity className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
               </div>
             </div>
             <div>
@@ -129,7 +129,7 @@ export default function DiagnosticsPage() {
           {/* Column 1: Frontend Config */}
           <div className="md:col-span-1 rounded-2xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/60 p-6 backdrop-blur-xl space-y-6 shadow-sm dark:shadow-none">
             <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2 border-b border-slate-200 dark:border-white/5 pb-3">
-              <Globe className="h-4 w-4 text-cyan-550 dark:text-cyan-400" />
+              <Globe className="h-4 w-4 text-cyan-500 dark:text-cyan-400" />
               Client Environment
             </h2>
             <div className="space-y-4 text-sm">
@@ -185,7 +185,7 @@ export default function DiagnosticsPage() {
                 </span>
               </div>
               <div className="space-y-4">
-                <div className="font-mono text-xs bg-white/80 dark:bg-slate-955 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300 max-h-40 overflow-y-auto">
+                <div className="font-mono text-xs bg-white/80 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-white/5 whitespace-pre-wrap break-all text-slate-700 dark:text-slate-300 max-h-40 overflow-y-auto">
                   {backendHealth.detail}
                 </div>
                 {backendHealth.data && (
@@ -204,7 +204,7 @@ export default function DiagnosticsPage() {
               )}
               <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-3 mb-4">
                 <h2 className="text-lg font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                  <Database className="h-4 w-4 text-cyan-550 dark:text-cyan-400" />
+                  <Database className="h-4 w-4 text-cyan-500 dark:text-cyan-400" />
                   Internal Connections Report (`/api/diagnostics`)
                 </h2>
                 <span className={`text-xs px-2.5 py-1 rounded-full border ${getStatusColor(backendDiagnostics.status)}`}>
@@ -216,29 +216,29 @@ export default function DiagnosticsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">PostgreSQL Database</div>
-                      <div className={`text-sm font-semibold ${backendDiagnostics.data.database === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
+                      <div className={`text-sm font-semibold ${backendDiagnostics.data.database === 'connected' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.database}
                       </div>
                     </div>
                     <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Qdrant Vector Database</div>
-                      <div className={`text-sm font-semibold ${backendDiagnostics.data.qdrant === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
+                      <div className={`text-sm font-semibold ${backendDiagnostics.data.qdrant === 'connected' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.qdrant}
                       </div>
                     </div>
                     <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Redis Cache/Queue</div>
-                      <div className={`text-sm font-semibold ${backendDiagnostics.data.redis === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
+                      <div className={`text-sm font-semibold ${backendDiagnostics.data.redis === 'connected' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.redis}
                       </div>
                     </div>
                     <div className="p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-1">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">NVIDIA NIM AI</div>
-                      <div className={`text-sm font-semibold ${backendDiagnostics.data.nvidia_nim === 'connected' ? 'text-emerald-605 dark:text-emerald-400' : 'text-rose-605 dark:text-rose-400'}`}>
+                      <div className={`text-sm font-semibold ${backendDiagnostics.data.nvidia_nim === 'connected' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {backendDiagnostics.data.nvidia_nim}
                       </div>
                     </div>
-                    <div className="sm:col-span-2 p-4 bg-white/80 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
+                    <div className="sm:col-span-2 p-4 bg-white/80 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
                       <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase">Backend OAuth Setup</div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex items-center gap-2">
@@ -266,18 +266,18 @@ export default function DiagnosticsPage() {
         <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/5 p-5 flex items-start gap-4 shadow-sm dark:shadow-none">
           <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
           <div className="space-y-1 text-sm text-yellow-800 dark:text-yellow-200/80">
-            <h4 className="font-semibold text-yellow-750 dark:text-yellow-400">Troubleshooting Network / Fetch Failures:</h4>
+            <h4 className="font-semibold text-yellow-600 dark:text-yellow-400">Troubleshooting Network / Fetch Failures:</h4>
             <ul className="list-disc pl-4 space-y-1 text-xs">
               <li>Check your browser's Developer Tools Console (F12) for detailed errors.</li>
               <li>If you see a CORS error, check the Hugging Face Space settings environment variable <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-800 dark:text-white">ALLOWED_ORIGINS</code>. It must match your Vercel deployment URL (e.g. <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-800 dark:text-white">https://xxx.vercel.app</code>) or be set to <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-800 dark:text-white">*</code>.</li>
-              <li>Verify that the Vercel frontend build configuration has the environment variable <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-805 dark:text-white">NEXT_PUBLIC_API_URL</code> set to the exact HTTPS URL of the Hugging Face Space (e.g. <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-805 dark:text-white">https://username-spacename.hf.space</code>). Do not use the embedding URL wrapping the iframe.</li>
+              <li>Verify that the Vercel frontend build configuration has the environment variable <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-800 dark:text-white">NEXT_PUBLIC_API_URL</code> set to the exact HTTPS URL of the Hugging Face Space (e.g. <code className="bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded text-slate-800 dark:text-white">https://username-spacename.hf.space</code>). Do not use the embedding URL wrapping the iframe.</li>
             </ul>
           </div>
         </div>
 
         {/* Back Link */}
         <div className="text-center">
-          <Link href="/login" className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-750 dark:hover:text-cyan-300 font-medium flex items-center justify-center gap-1">
+          <Link href="/login" className="text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium flex items-center justify-center gap-1">
             <Shield className="h-3 w-3" /> Back to Secure Login
           </Link>
         </div>

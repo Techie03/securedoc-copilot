@@ -88,7 +88,7 @@ export default function Dashboard() {
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-1">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               System status is healthy. All intelligence nodes running exclusively on NVIDIA NIM.
@@ -143,7 +143,7 @@ export default function Dashboard() {
                     <Link
                       key={idx}
                       href={item.href}
-                      className={`group flex items-start gap-4 rounded-2xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-350 hover:bg-white/95 dark:hover:bg-slate-900/45 dark:hover:border-white/10 shadow-sm shadow-slate-100/30 dark:shadow-none hover:shadow-md`}
+                      className={`group flex items-start gap-4 rounded-2xl border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-300 hover:bg-white/95 dark:hover:bg-slate-900/45 dark:hover:border-white/10 shadow-sm shadow-slate-100/30 dark:shadow-none hover:shadow-md`}
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 group-hover:bg-gradient-to-tr group-hover:from-cyan-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-300">
                         <Icon className="h-5 w-5" />
@@ -165,7 +165,7 @@ export default function Dashboard() {
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Workspaces</h2>
               <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/80 dark:bg-slate-900/30 backdrop-blur-md shadow-sm">
-                <div className="divide-y divide-gray-150 dark:divide-white/5">
+                <div className="divide-y divide-slate-200/50 dark:divide-white/5">
                   {workspaces.map((ws) => (
                     <div 
                       key={ws.id} 
@@ -245,7 +245,7 @@ export default function Dashboard() {
                     <div className="h-full w-0 rounded-full bg-cyan-500" />
                   </div>
                 </div>
-                <div className="pt-2 border-t border-gray-150 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="pt-2 border-t border-slate-200/50 dark:border-white/5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Estimated NIM Billing:</span>
                   <span className="font-bold text-emerald-500 dark:text-emerald-400">$0.00</span>
                 </div>

@@ -112,9 +112,9 @@ export default function MemoryPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-955 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white min-h-[calc(100vh-4rem)]">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
-        <p className="mt-4 text-sm text-slate-655 dark:text-slate-400 font-medium">Authenticating secure context...</p>
+        <p className="mt-4 text-sm text-slate-600 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
     );
   }
@@ -217,7 +217,7 @@ export default function MemoryPage() {
                     placeholder="e.g. Preferred Language, Coding Style"
                     value={newKey}
                     onChange={(e) => setNewKey(e.target.value)}
-                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-955/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35"
+                    className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-white/80 dark:bg-slate-950/50 py-2.5 px-3.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all duration-300 focus:border-cyan-500 focus:ring-cyan-500/35"
                   />
                 </div>
 

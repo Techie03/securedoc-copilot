@@ -822,7 +822,7 @@ export default function ChatPage() {
               {documentsLoading && documents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-2">
                   <Loader2 className="h-6 w-6 animate-spin text-cyan-500 dark:text-cyan-400" />
-                  <span className="text-xs text-slate-550">Loading ingested documents...</span>
+                  <span className="text-xs text-slate-500">Loading ingested documents...</span>
                 </div>
               ) : documents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-center py-12 px-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-900/20">
@@ -852,7 +852,7 @@ export default function ChatPage() {
                           <p className="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[150px]" title={doc.filename}>
                             {doc.filename}
                           </p>
-                          <p className="text-[10px] text-slate-550 mt-0.5 font-medium">
+                          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
                             Size: {getMockFileSize(doc.filename, doc.id)}
                           </p>
                         </div>
@@ -997,7 +997,7 @@ export default function ChatPage() {
               {memoriesLoading ? (
                 <div className="flex items-center gap-2 py-4">
                   <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
-                  <span className="text-xs text-slate-550">Syncing memory profiles...</span>
+                  <span className="text-xs text-slate-500">Syncing memory profiles...</span>
                 </div>
               ) : memories.length === 0 ? (
                 <div className="text-xs text-slate-500">

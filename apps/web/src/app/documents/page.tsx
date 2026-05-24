@@ -304,7 +304,7 @@ export default function DocumentLibrary() {
 
             {/* Error Message */}
             {error && (
-              <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-650 dark:text-rose-400 flex items-start gap-3">
+              <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-600 dark:text-rose-400 flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold">Execution Error</h4>
@@ -429,7 +429,7 @@ export default function DocumentLibrary() {
                           
                           <button
                             onClick={() => setStagedFiles(prev => prev.filter((_, i) => i !== idx))}
-                            className="text-slate-450 hover:text-rose-500 p-1 cursor-pointer transition-colors"
+                            className="text-slate-400 hover:text-rose-500 p-1 cursor-pointer transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -484,7 +484,7 @@ export default function DocumentLibrary() {
                   {loading ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8">
                       <Loader2 className="h-8 w-8 animate-spin text-blue-500 dark:text-blue-400" />
-                      <p className="mt-3 text-xs text-slate-650 dark:text-slate-400">Loading ingested documents...</p>
+                      <p className="mt-3 text-xs text-slate-600 dark:text-slate-400">Loading ingested documents...</p>
                     </div>
                   ) : filteredDocs.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -541,7 +541,7 @@ export default function DocumentLibrary() {
                               <td className="py-3 px-4 text-xs text-right">
                                 <button
                                   onClick={() => setDeleteTarget(doc)}
-                                  className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-rose-500/10 hover:text-rose-650 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                                  className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
                                   title="Delete Document"
                                 >
                                   <Trash2 className="h-4 w-4" />

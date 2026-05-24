@@ -50,7 +50,7 @@ const itemVariants = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-955 transition-colors duration-300">
+    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col justify-between overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
       
       {/* Glow effects */}
       <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 h-[350px] w-[350px] rounded-full bg-violet-600/10 blur-[100px] pointer-events-none dark:bg-violet-500/15" />
