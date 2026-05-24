@@ -33,6 +33,7 @@ export default function Header() {
   const [showWorkspaceMenu, setShowWorkspaceMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   
   // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -54,6 +55,15 @@ export default function Header() {
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Listen to window scroll to adjust header aesthetics
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Close dropdowns on outside click
@@ -93,7 +103,11 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-gray-200/40 bg-white/60 backdrop-blur-md transition-all duration-300 dark:border-white/10 dark:bg-slate-950/60">
+      <header className={`sticky top-0 z-40 w-full transition-all duration-300 backdrop-blur-md ${
+        isScrolled
+          ? 'border-b border-gray-200 bg-white/85 shadow-md shadow-slate-100/40 dark:border-white/10 dark:bg-slate-950/85 dark:shadow-cyan-950/10'
+          : 'border-b border-transparent bg-white/40 dark:bg-slate-950/40'
+      }`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Left: Brand Logo & Title */}

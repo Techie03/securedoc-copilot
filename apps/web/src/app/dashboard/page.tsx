@@ -143,7 +143,7 @@ export default function Dashboard() {
                     <Link
                       key={idx}
                       href={item.href}
-                      className={`group flex items-start gap-4 rounded-2xl border border-gray-250 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-350 dark:hover:border-white/10`}
+                      className={`group flex items-start gap-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/30 p-5 backdrop-blur-md transition-all duration-300 hover:border-slate-300 dark:hover:border-white/10`}
                     >
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 group-hover:bg-gradient-to-tr group-hover:from-cyan-500 group-hover:to-violet-500 group-hover:text-white transition-all duration-300">
                         <Icon className="h-5 w-5" />

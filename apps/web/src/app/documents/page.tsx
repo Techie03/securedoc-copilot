@@ -422,7 +422,7 @@ export default function DocumentLibrary() {
                           <div className="flex items-center gap-2 min-w-0">
                             <FileText className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
                             <div className="min-w-0">
-                              <p className="text-xs font-semibold text-slate-800 dark:text-slate-250 truncate max-w-[150px]">{file.name}</p>
+                              <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[150px]">{file.name}</p>
                               <p className="text-[10px] text-slate-500">{(file.size / 1024).toFixed(1)} KB</p>
                             </div>
                           </div>

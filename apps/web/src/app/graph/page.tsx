@@ -55,8 +55,8 @@ export default function GraphPage() {
   if (authLoading) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-white min-h-[calc(100vh-4rem)] transition-colors duration-300">
-        <Loader2 className="h-8 w-8 animate-spin text-cyan-550 dark:text-cyan-400" />
-        <p className="mt-4 text-sm text-slate-505 dark:text-slate-400 font-medium">Authenticating secure context...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 font-medium">Authenticating secure context...</p>
       </div>
     );
   }
@@ -93,10 +93,10 @@ export default function GraphPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2.5">
-              <Network className="h-6 w-6 text-cyan-550 dark:text-cyan-400" />
+              <Network className="h-6 w-6 text-cyan-500 dark:text-cyan-400" />
               Knowledge Graph Explorer
             </h1>
-            <p className="text-sm text-slate-550 dark:text-slate-400 mt-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Visualize semantic relationships extracted by NVIDIA NIM in workspace: <span className="text-cyan-600 dark:text-cyan-400 font-semibold">{currentWorkspace.name}</span>
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function GraphPage() {
 
         {/* Info Banner */}
         <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/30 p-4 flex gap-3 text-xs text-slate-600 dark:text-slate-400 backdrop-blur-sm max-w-4xl leading-relaxed">
-          <Info className="h-4 w-4 text-cyan-550 dark:text-cyan-400 shrink-0 mt-0.5" />
+          <Info className="h-4 w-4 text-cyan-500 dark:text-cyan-400 shrink-0 mt-0.5" />
           <div>
             <p>
               <strong className="text-slate-800 dark:text-slate-200">How GraphRAG works:</strong> During document ingestion, our AI models automatically extract structured Entity-Relationship Triples (Subject &rarr; Predicate &rarr; Object). During chat sessions, this knowledge graph is traversed to supplement vector search and answer complex, multi-hop reasoning questions.
@@ -140,16 +140,16 @@ export default function GraphPage() {
         {/* Triples Data Grid */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin text-cyan-550 dark:text-cyan-400" />
-            <p className="text-sm text-slate-505 dark:text-slate-400">Querying semantic graph database...</p>
+            <Loader2 className="h-8 w-8 animate-spin text-cyan-500 dark:text-cyan-400" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">Querying semantic graph database...</p>
           </div>
         ) : filteredTriples.length === 0 ? (
           <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/40 dark:bg-slate-900/10 p-12 text-center backdrop-blur-sm">
-            <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-505 flex items-center justify-center mx-auto mb-4">
+            <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto mb-4">
               <Database className="h-6 w-6" />
             </div>
-            <h3 className="text-sm font-bold text-slate-850 dark:text-white mb-1">No Relationships Found</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-505 max-w-sm mx-auto leading-relaxed">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-1">No Relationships Found</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-500 max-w-sm mx-auto leading-relaxed">
               {searchQuery 
                 ? "No triples match your search query." 
                 : "No knowledge graph data has been extracted yet. Upload documents to automatically trigger extraction."}
@@ -171,17 +171,17 @@ export default function GraphPage() {
                   <div className="flex flex-col space-y-3 relative z-10">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Subject</span>
-                      <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-550 dark:group-hover:text-cyan-300 transition-colors bg-cyan-500/10 dark:bg-cyan-400/10 px-2 py-1 rounded w-fit">{triple.subject}</span>
+                      <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-300 transition-colors bg-cyan-500/10 dark:bg-cyan-400/10 px-2 py-1 rounded w-fit">{triple.subject}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-slate-505 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                       <ArrowRight className="h-4 w-4" />
                       <span className="text-xs font-mono bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5">{triple.predicate}</span>
                     </div>
                     
                     <div className="flex flex-col items-end">
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 w-full text-right">Object</span>
-                      <span className="text-sm font-semibold text-violet-600 dark:text-violet-400 group-hover:text-violet-550 dark:group-hover:text-violet-300 transition-colors bg-violet-500/10 dark:bg-violet-400/10 px-2 py-1 rounded w-fit">{triple.object_entity}</span>
+                      <span className="text-sm font-semibold text-violet-600 dark:text-violet-400 group-hover:text-violet-500 dark:group-hover:text-violet-300 transition-colors bg-violet-500/10 dark:bg-violet-400/10 px-2 py-1 rounded w-fit">{triple.object_entity}</span>
                     </div>
                   </div>
                   
