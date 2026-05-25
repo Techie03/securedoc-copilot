@@ -337,22 +337,22 @@ export default function ChatPage() {
 
   const getUserBubbleClass = () => {
     if (platform === 'ios') {
-      return 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white rounded-3xl rounded-tr-sm border-transparent shadow-sm';
+      return 'bg-gray-100 dark:bg-gradient-to-tr dark:from-blue-600 dark:to-indigo-600 text-gray-900 dark:text-white rounded-3xl rounded-tr-sm border-transparent shadow-sm';
     }
     if (platform === 'android') {
-      return 'bg-cyan-600 dark:bg-cyan-700 text-white rounded-2xl rounded-tr-none border-transparent shadow-md';
+      return 'bg-gray-100 dark:bg-cyan-700 text-gray-900 dark:text-white rounded-2xl rounded-tr-none border-transparent shadow-md';
     }
-    return 'bg-gradient-to-tr from-violet-500/10 to-cyan-500/10 dark:from-slate-900 dark:to-slate-900 border-violet-500/15 dark:border-white/5 rounded-tr-none text-slate-800 dark:text-slate-100 shadow-sm';
+    return 'bg-gray-100 dark:from-slate-900 dark:to-slate-900 border-gray-200 dark:border-white/5 rounded-tr-none text-gray-900 dark:text-slate-100 shadow-sm';
   };
 
   const getAssistantBubbleClass = () => {
     if (platform === 'ios') {
-      return 'bg-white/90 dark:bg-slate-900/60 border-slate-200/50 dark:border-white/5 rounded-3xl rounded-tl-sm text-slate-700 dark:text-slate-200 backdrop-blur-md';
+      return 'bg-gray-100 dark:bg-slate-900/60 border-gray-200 dark:border-white/5 rounded-3xl rounded-tl-sm text-gray-900 dark:text-slate-200 backdrop-blur-md';
     }
     if (platform === 'android') {
-      return 'bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 rounded-2xl rounded-tl-none text-slate-700 dark:text-slate-200 shadow-sm';
+      return 'bg-gray-100 dark:bg-slate-900 border-gray-200 dark:border-white/10 rounded-2xl rounded-tl-none text-gray-900 dark:text-slate-200 shadow-sm';
     }
-    return 'bg-white/85 dark:bg-slate-900/40 border-slate-200/50 dark:border-white/5 rounded-tl-none text-slate-700 dark:text-slate-200 backdrop-blur-sm shadow-sm';
+    return 'bg-gray-100 dark:bg-slate-900/40 border-gray-200 dark:border-white/5 rounded-tl-none text-gray-900 dark:text-slate-200 backdrop-blur-sm shadow-sm';
   };
 
   return (
@@ -564,7 +564,7 @@ export default function ChatPage() {
                       setInputMessage(item.text);
                       setSelectedMode(item.mode);
                     }}
-                    className="p-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-white/70 dark:bg-slate-900/30 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-slate-300 dark:hover:border-white/10 transition-all text-left flex items-center justify-between group cursor-pointer"
+                    className="p-4 rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-slate-900/30 text-xs text-gray-900 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-900 hover:border-gray-300 dark:hover:border-white/10 transition-all text-left flex items-center justify-between group cursor-pointer"
                   >
                     <span>{item.text}</span>
                     <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-cyan-500 dark:group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
@@ -704,7 +704,7 @@ export default function ChatPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Ask secure agent... (e.g. Find key clauses, code assistance, memory summary)"
-                className="flex-1 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50 py-3 sm:py-3.5 pl-4 pr-12 sm:pr-14 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
+                className="flex-1 rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-slate-900/50 py-3 sm:py-3.5 pl-4 pr-12 sm:pr-14 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
                 disabled={sendLoading}
               />
               
