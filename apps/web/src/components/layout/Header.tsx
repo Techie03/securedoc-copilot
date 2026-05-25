@@ -20,13 +20,14 @@ import {
   User as UserIcon,
   X,
   Loader2,
-  Menu
+  Menu,
+  Trash2
 } from 'lucide-react';
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { user, workspaces, currentWorkspace, selectWorkspace, createWorkspace, logout } = useAuth();
+  const { user, workspaces, currentWorkspace, selectWorkspace, createWorkspace, deleteWorkspace, logout } = useAuth();
   const pathname = usePathname();
   
   // Dropdown states
@@ -83,6 +84,16 @@ export default function Header() {
   const toggleTheme = () => {
     if (!mounted) return;
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleDeleteWorkspace = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this workspace? All its data will be lost.')) return;
+    try {
+      await deleteWorkspace(id);
+    } catch (err: any) {
+      alert(err.detail || 'Failed to delete workspace.');
+    }
   };
 
   const handleCreateWorkspaceSubmit = async (e: React.FormEvent) => {
@@ -161,21 +172,29 @@ export default function Header() {
                       </div>
                       <div className="max-h-60 overflow-y-auto py-1">
                         {workspaces.map((ws) => (
-                          <button
-                            key={ws.id}
-                            onClick={() => {
-                              selectWorkspace(ws);
-                              setShowWorkspaceMenu(false);
-                            }}
-                            className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs transition-colors cursor-pointer ${
-                              currentWorkspace?.id === ws.id
-                                ? 'bg-cyan-500/10 text-cyan-400 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5'
-                            }`}
-                          >
-                            <FolderLock className="h-3.5 w-3.5 shrink-0" />
-                            <span className="truncate">{ws.name}</span>
-                          </button>
+                          <div key={ws.id} className="flex items-center group">
+                            <button
+                              onClick={() => {
+                                selectWorkspace(ws);
+                                setShowWorkspaceMenu(false);
+                              }}
+                              className={`flex-1 flex items-center gap-2 rounded-xl px-3 py-2 text-left text-xs transition-colors cursor-pointer ${
+                                currentWorkspace?.id === ws.id
+                                  ? 'bg-cyan-500/10 text-cyan-400 font-semibold'
+                                  : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-white/5'
+                              }`}
+                            >
+                              <FolderLock className="h-3.5 w-3.5 shrink-0" />
+                              <span className="truncate">{ws.name}</span>
+                            </button>
+                            <button
+                              onClick={(e) => handleDeleteWorkspace(e, ws.id)}
+                              className="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-rose-500 transition-all cursor-pointer"
+                              title="Delete Workspace"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
                         ))}
                       </div>
                       <div className="border-t border-slate-200/50 my-1.5 dark:border-white/5" />

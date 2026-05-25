@@ -77,8 +77,60 @@ export default function ChatPage() {
   const [documents, setDocuments] = useState<DocumentResponse[]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<'documents' | 'telemetry'>('documents');
+  const [isListening, setIsListening] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event: any) => {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (finalTranscript) {
+            setInputMessage((prev) => prev + (prev ? ' ' : '') + finalTranscript.trim());
+          }
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          setIsListening(false);
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current = recognition;
+      }
+    }
+  }, []);
+
+  const toggleListen = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (!recognitionRef.current) {
+        alert("Speech recognition is not supported in your browser.");
+        return;
+      }
+      setInputMessage('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -717,8 +769,13 @@ export default function ChatPage() {
               <div className="absolute right-2 sm:right-2.5 flex items-center gap-1.5">
                 <button
                   type="button"
-                  title="Voice Input (Coming Soon)"
-                  className="p-2 rounded-xl text-slate-400 hover:bg-slate-200 hover:text-cyan-600 dark:hover:bg-white/10 dark:hover:text-cyan-400 transition-all cursor-pointer"
+                  onClick={toggleListen}
+                  title={isListening ? "Stop Voice Input" : "Start Voice Input"}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${
+                    isListening 
+                      ? 'text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 animate-pulse'
+                      : 'text-slate-400 hover:bg-slate-200 hover:text-cyan-600 dark:hover:bg-white/10 dark:hover:text-cyan-400'
+                  }`}
                 >
                   <Mic className="h-4 w-4" />
                 </button>

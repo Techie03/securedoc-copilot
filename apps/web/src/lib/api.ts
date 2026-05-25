@@ -320,6 +320,12 @@ export const api = {
     });
   },
   
+  async deleteWorkspace(workspaceId: string): Promise<void> {
+    return request<void>(`/workspaces/${workspaceId}`, {
+      method: 'DELETE',
+    });
+  },
+  
   async getWorkspaceGraph(workspaceId: string): Promise<KnowledgeTriple[]> {
     return request<KnowledgeTriple[]>(`/workspaces/${workspaceId}/graph`, {
       method: 'GET',

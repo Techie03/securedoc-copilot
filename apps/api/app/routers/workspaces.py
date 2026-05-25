@@ -36,6 +36,38 @@ def list_workspaces_endpoint(
     """
     return crud.get_workspaces_for_user(db=db, user_id=current_user.id)
 
+@router.delete("/{workspace_id}", status_code=status.HTTP_200_OK)
+def delete_workspace_endpoint(
+    workspace_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete a workspace. Only owners can delete the workspace.
+    """
+    # 1. Verify membership
+    requester_membership = get_current_workspace_member(
+        workspace_id=workspace_id, db=db, current_user=current_user
+    )
+    if requester_membership.role != "owner":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the workspace owner can delete the workspace."
+        )
+
+    # 2. Delete workspace
+    workspace = crud.get_workspace(db, workspace_id=workspace_id)
+    if not workspace:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Workspace not found"
+        )
+        
+    db.delete(workspace)
+    db.commit()
+    
+    return {"detail": "Workspace deleted successfully."}
+
 @router.get("/{workspace_id}", response_model=WorkspaceDetailResponse)
 def get_workspace_details(
     workspace_id: str,

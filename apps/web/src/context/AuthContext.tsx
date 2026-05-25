@@ -17,6 +17,7 @@ interface AuthContextType {
   logout: () => void;
   selectWorkspace: (workspace: Workspace) => void;
   createWorkspace: (name: string) => Promise<Workspace>;
+  deleteWorkspace: (id: string) => Promise<void>;
   refreshWorkspaces: () => Promise<void>;
 }
 
@@ -225,6 +226,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [selectWorkspace]);
 
+  const deleteWorkspace = React.useCallback(async (id: string) => {
+    try {
+      await api.deleteWorkspace(id);
+      setWorkspaces(prev => {
+        const next = prev.filter(ws => ws.id !== id);
+        if (currentWorkspace?.id === id) {
+          if (next.length > 0) {
+            setCurrentWorkspace(next[0]);
+            localStorage.setItem('securedoc_current_workspace_id', next[0].id);
+          } else {
+            setCurrentWorkspace(null);
+            localStorage.removeItem('securedoc_current_workspace_id');
+          }
+        }
+        return next;
+      });
+    } catch (error) {
+      console.error('Failed to delete workspace:', error);
+      throw error;
+    }
+  }, [currentWorkspace]);
+
   const refreshWorkspaces = React.useCallback(async () => {
     try {
       const wsList = await api.listWorkspaces();
@@ -255,6 +278,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         selectWorkspace,
         createWorkspace,
+        deleteWorkspace,
         refreshWorkspaces,
       }}
     >
