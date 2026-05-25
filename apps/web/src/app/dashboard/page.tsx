@@ -300,6 +300,7 @@ export default function Dashboard() {
           </div>
 
         </div>
+      </div>
 
       {/* Futuristic Local Workspace Creation Modal */}
       <AnimatePresence>
