@@ -22,6 +22,9 @@ import {
   Link as LinkIcon,
   Network
 } from 'lucide-react';
+import TokenFlowChart from '@/components/analytics/TokenFlowChart';
+import EvaluationRadar from '@/components/analytics/EvaluationRadar';
+import SemanticDensityChart from '@/components/analytics/SemanticDensityChart';
 
 const navigationGrid = [
   { title: 'Agent RAG Chat', href: '/chat', desc: 'Secure document-grounded AI search and multi-route assistant.', icon: MessageSquare, color: 'hover:border-violet-500/40 text-violet-500 bg-violet-500/10' },
@@ -272,6 +275,38 @@ export default function Dashboard() {
           </div>
 
         </div>
+
+        {/* Neural Analytics Console */}
+        <div className="mt-12 mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Sparkles className="h-5 w-5 text-cyan-500" />
+            <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Neural Analytics Console</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Token Flow */}
+            <div className="rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/70 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm flex flex-col">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Live Token Inference Flow</h3>
+              <div className="flex-1 min-h-[250px]">
+                <TokenFlowChart />
+              </div>
+            </div>
+            {/* Evaluation Radar */}
+            <div className="rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/70 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm flex flex-col">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Agent Performance Metrics</h3>
+              <div className="flex-1 min-h-[250px]">
+                <EvaluationRadar />
+              </div>
+            </div>
+            {/* Semantic Density */}
+            <div className="rounded-2xl border border-slate-200/50 dark:border-white/5 bg-white/70 dark:bg-slate-900/40 p-5 backdrop-blur-md shadow-sm flex flex-col">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Semantic Density Vector Space</h3>
+              <div className="flex-1 min-h-[250px]">
+                <SemanticDensityChart />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* Futuristic Local Workspace Creation Modal */}
