@@ -108,10 +108,10 @@ export default function Header() {
           ? 'border-b border-gray-200 bg-white/85 shadow-md shadow-slate-100/40 dark:border-white/10 dark:bg-slate-950/85 dark:shadow-cyan-950/10'
           : 'border-b border-transparent bg-white/40 dark:bg-slate-950/40'
       }`}>
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 xl:gap-8 px-4 sm:px-6 lg:px-8">
           
           {/* Left: Brand Logo & Title */}
-          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+          <div className="flex items-center gap-4 sm:gap-6 shrink-0">
             <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
               <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-violet-600 to-cyan-500 p-[1.5px] shadow-lg shadow-violet-500/20 group-hover:shadow-cyan-500/30 transition-all duration-300">
                 <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-white dark:bg-slate-950 transition-colors duration-300">
@@ -219,7 +219,7 @@ export default function Header() {
           )}
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             
             {/* GitHub Action Buttons (Desktop only) */}
             <nav className="hidden xl:flex items-center gap-3">
