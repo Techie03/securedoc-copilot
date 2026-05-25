@@ -29,7 +29,8 @@ import {
   LineChart,
   LayoutGrid,
   RefreshCw,
-  X
+  X,
+  Mic
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
@@ -704,21 +705,30 @@ export default function ChatPage() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Ask secure agent... (e.g. Find key clauses, code assistance, memory summary)"
-                className="flex-1 rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-slate-900/50 py-3 sm:py-3.5 pl-4 pr-12 sm:pr-14 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
+                className="flex-1 rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-slate-900/50 py-3 sm:py-3.5 pl-4 pr-24 sm:pr-28 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 outline-none ring-1 ring-transparent focus:border-cyan-500 focus:ring-cyan-500/35 transition-all duration-300 shadow-sm"
                 disabled={sendLoading}
               />
               
-              <button
-                type="submit"
-                disabled={sendLoading || !inputMessage.trim()}
-                className="absolute right-2 sm:right-2.5 p-2 rounded-xl bg-cyan-600 text-white disabled:opacity-40 hover:bg-cyan-500 shadow-md shadow-cyan-500/10 transition-all cursor-pointer"
-              >
-                {sendLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </button>
+              <div className="absolute right-2 sm:right-2.5 flex items-center gap-1.5">
+                <button
+                  type="button"
+                  title="Voice Input (Coming Soon)"
+                  className="p-2 rounded-xl text-slate-400 hover:bg-slate-200 hover:text-cyan-600 dark:hover:bg-white/10 dark:hover:text-cyan-400 transition-all cursor-pointer"
+                >
+                  <Mic className="h-4 w-4" />
+                </button>
+                <button
+                  type="submit"
+                  disabled={sendLoading || !inputMessage.trim()}
+                  className="p-2 rounded-xl bg-cyan-600 text-white disabled:opacity-40 hover:bg-cyan-500 shadow-md shadow-cyan-500/10 transition-all cursor-pointer"
+                >
+                  {sendLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </form>
             <div className="max-w-3xl mx-auto mt-2.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 text-[10px] text-slate-500">
               <span className="flex items-center gap-1">
