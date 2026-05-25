@@ -30,12 +30,17 @@ import {
   LayoutGrid,
   RefreshCw,
   X,
-  Mic
+  Mic,
+  ArrowLeftRight
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
-  { value: 'rag', label: 'Document-Based Mode', icon: Database, color: 'text-cyan-400 bg-cyan-400/10' },
-  { value: 'general', label: 'General Mode', icon: HelpCircle, color: 'text-slate-400 bg-slate-400/10' }
+  { value: 'rag', label: 'Document RAG', icon: Database, color: 'text-cyan-400 bg-cyan-400/10' },
+  { value: 'coding', label: 'Coding', icon: Code, color: 'text-purple-400 bg-purple-400/10' },
+  { value: 'summary', label: 'Summary', icon: FileText, color: 'text-emerald-400 bg-emerald-400/10' },
+  { value: 'compare', label: 'Compare', icon: ArrowLeftRight, color: 'text-orange-400 bg-orange-400/10' },
+  { value: 'memory', label: 'Memory', icon: Brain, color: 'text-pink-400 bg-pink-400/10' },
+  { value: 'chitchat', label: 'Chitchat', icon: MessageSquare, color: 'text-slate-400 bg-slate-400/10' }
 ];
 
 function getMockFileSize(filename: string, id: string): string {
