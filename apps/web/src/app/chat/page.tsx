@@ -435,7 +435,7 @@ export default function ChatPage() {
     if (platform === 'android') {
       return 'bg-gray-100 dark:bg-cyan-700 text-gray-900 dark:text-white rounded-2xl rounded-tr-none border-transparent shadow-md';
     }
-    return 'bg-gray-100 dark:from-slate-900 dark:to-slate-900 border-gray-200 dark:border-white/5 rounded-tr-none text-gray-900 dark:text-slate-100 shadow-sm';
+    return 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-white/5 rounded-tr-none text-gray-900 dark:text-slate-100 shadow-sm';
   };
 
   const getAssistantBubbleClass = () => {
