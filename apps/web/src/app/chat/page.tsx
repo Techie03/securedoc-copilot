@@ -31,7 +31,8 @@ import {
   RefreshCw,
   X,
   Mic,
-  ArrowLeftRight
+  ArrowLeftRight,
+  ImageIcon
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
@@ -78,9 +79,11 @@ export default function ChatPage() {
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<'documents' | 'telemetry'>('documents');
   const [isListening, setIsListening] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -140,6 +143,29 @@ export default function ChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, messagesLoading]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+    
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result && typeof ev.target.result === 'string') {
+          setSelectedImages(prev => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
 
   // Load chat sessions when workspace changes
   useEffect(() => {
@@ -324,10 +350,12 @@ export default function ChatPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !activeSession?.id || !currentWorkspace?.id || sendLoading) return;
+    if ((!inputMessage.trim() && selectedImages.length === 0) || !activeSession?.id || !currentWorkspace?.id || sendLoading) return;
 
     const userText = inputMessage.trim();
+    const imagesToSend = [...selectedImages];
     setInputMessage('');
+    setSelectedImages([]);
     setSendLoading(true);
 
     // 1. Optimistic UI update: user message
@@ -337,13 +365,20 @@ export default function ChatPage() {
       role: 'user',
       content: userText,
       mode: selectedMode,
+      images_json: imagesToSend.length > 0 ? imagesToSend : undefined,
       created_at: new Date().toISOString()
     };
     setMessages(prev => [...prev, tempUserMsg]);
 
     try {
       // 2. Call backend
-      const res = await api.sendChatMessage(currentWorkspace.id, activeSession.id, userText, selectedMode);
+      const res = await api.sendChatMessage(
+        currentWorkspace.id, 
+        activeSession.id, 
+        userText || "Analyze this image.", 
+        selectedMode, 
+        imagesToSend.length > 0 ? imagesToSend : undefined
+      );
       
       // 3. Update message list with final user and assistant messages
       // Simply reload to ensure state consistency (and get correct DB IDs)
@@ -655,6 +690,15 @@ export default function ChatPage() {
                         isUser ? getUserBubbleClass() : getAssistantBubbleClass()
                       }`}
                     >
+                      {msg.images_json && msg.images_json.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {msg.images_json.map((imgStr, i) => (
+                            <div key={i} className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm max-w-[250px]">
+                              <img src={imgStr} alt="Attached" className="object-cover w-full h-auto" />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {msg.content}
 
                       {/* Source/Citation Popovers */}
@@ -756,7 +800,41 @@ export default function ChatPage() {
             className="p-4 sm:p-6 bg-white/50 dark:bg-slate-900/10 border-t border-slate-200 dark:border-white/5 shrink-0"
             style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}
           >
+            {/* Image Preview Area */}
+            {selectedImages.length > 0 && (
+              <div className="max-w-3xl mx-auto mb-3 flex flex-wrap gap-3">
+                {selectedImages.map((imgUrl, i) => (
+                  <div key={i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm group">
+                    <img src={imgUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 p-1 bg-slate-900/60 hover:bg-rose-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
             <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto relative flex items-center gap-3">
+              <input 
+                type="file" 
+                multiple 
+                accept="image/*" 
+                className="hidden" 
+                ref={fileInputRef} 
+                onChange={handleImageUpload} 
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-3 sm:py-3.5 rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-slate-900/50 text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all cursor-pointer shadow-sm shrink-0"
+                title="Attach Images"
+              >
+                <ImageIcon className="h-5 w-5" />
+              </button>
+              
               <input
                 type="text"
                 value={inputMessage}
@@ -781,7 +859,7 @@ export default function ChatPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={sendLoading || !inputMessage.trim()}
+                  disabled={sendLoading || (!inputMessage.trim() && selectedImages.length === 0)}
                   className="p-2 rounded-xl bg-cyan-600 text-white disabled:opacity-40 hover:bg-cyan-500 shadow-md shadow-cyan-500/10 transition-all cursor-pointer"
                 >
                   {sendLoading ? (

@@ -159,6 +159,7 @@ class ChatSessionResponse(BaseModel):
 class ChatMessageCreate(BaseModel):
     content: str
     mode: Optional[str] = "auto" # auto, rag, general, coding, summary, compare, table, memory, report
+    images: Optional[List[str]] = None # List of Base64 encoded images
 
 class ChatRunResponse(BaseModel):
     id: str
@@ -191,6 +192,7 @@ class ChatMessageResponse(BaseModel):
     content: str
     mode: Optional[str] = None
     sources_json: Optional[Any] = None # List or dict of retrieved citations
+    images_json: Optional[Any] = None # List of base64 images
     created_at: datetime
     chat_run: Optional[ChatRunResponse] = None
     evaluation_scores: Optional[EvaluationScoreResponse] = None

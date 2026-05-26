@@ -128,6 +128,7 @@ class ChatMessage(Base):
     content = Column(Text, nullable=False)
     mode = Column(String(50), nullable=True) # rag, general, coding, summary, compare, table, memory
     sources_json = Column(JSON, nullable=True) # Citations and sources
+    images_json = Column(JSON, nullable=True) # Base64 images or URLs
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships

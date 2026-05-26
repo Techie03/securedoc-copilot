@@ -18,6 +18,7 @@ class AgentState(TypedDict):
     user_id: str
     mode: str  # auto, rag, general, coding, summary, compare, table, memory, report
     route: str  # set by intent router
+    images: Optional[List[str]]
     context: List[Dict[str, Any]]
     response: str
     citations: List[Dict[str, Any]]
@@ -286,7 +287,17 @@ async def generator_node(state: AgentState) -> Dict[str, Any]:
     if context_str:
         user_prompt += context_str
         
-    messages.append({"role": "user", "content": user_prompt})
+    images = state.get("images")
+    if images and len(images) > 0:
+        content_parts = [{"type": "text", "text": user_prompt}]
+        for img in images:
+            content_parts.append({
+                "type": "image_url",
+                "image_url": {"url": img}
+            })
+        messages.append({"role": "user", "content": content_parts})
+    else:
+        messages.append({"role": "user", "content": user_prompt})
     
     try:
         response = await client.chat(messages=messages, temperature=0.2, max_tokens=1500)
@@ -458,7 +469,8 @@ class LangGraphAgent:
         chat_history: List[Dict[str, str]],
         workspace_id: str,
         user_id: str,
-        mode: str = "auto"
+        mode: str = "auto",
+        images: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Executes the cyclical workflow manually (simulating LangGraph orchestration)
@@ -475,6 +487,7 @@ class LangGraphAgent:
             "user_id": user_id,
             "mode": mode,
             "route": "general",
+            "images": images,
             "context": [],
             "response": "",
             "citations": [],

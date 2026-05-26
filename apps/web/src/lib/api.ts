@@ -106,6 +106,7 @@ export interface ChatMessage {
   content: string;
   mode?: string;
   sources_json?: Citation[];
+  images_json?: string[];
   created_at: string;
   chat_run?: ChatRun;
   evaluation_scores?: EvaluationScore;
@@ -392,10 +393,10 @@ export const api = {
     });
   },
 
-  async sendChatMessage(workspaceId: string, sessionId: string, content: string, mode: string = 'auto'): Promise<ChatMessage> {
+  async sendChatMessage(workspaceId: string, sessionId: string, content: string, mode: string = 'auto', images?: string[]): Promise<ChatMessage> {
     return request<ChatMessage>(`/workspaces/${workspaceId}/chats/${sessionId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ content, mode }),
+      body: JSON.stringify({ content, mode, images }),
     });
   },
 

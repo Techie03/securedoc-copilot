@@ -111,7 +111,8 @@ async def send_message(
         session_id=session_id,
         role="user",
         content=message_in.content,
-        mode=message_in.mode or "auto"
+        mode=message_in.mode or "auto",
+        images_json=message_in.images
     )
     db.add(user_message)
     db.commit()
@@ -142,7 +143,8 @@ async def send_message(
             chat_history=history,
             workspace_id=workspace_id,
             user_id=current_user.id,
-            mode=message_in.mode or "auto"
+            mode=message_in.mode or "auto",
+            images=message_in.images
         )
     except Exception as e:
         db.rollback()

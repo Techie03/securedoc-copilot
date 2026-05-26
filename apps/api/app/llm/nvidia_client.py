@@ -19,7 +19,7 @@ class NvidiaNIMClient:
 
     async def chat(
         self,
-        messages: List[Dict[str, str]],
+        messages: List[Dict[str, Any]],
         temperature: float = 0.2,
         max_tokens: int = 1200,
         model: str = None
@@ -29,15 +29,31 @@ class NvidiaNIMClient:
         """
         if self.mock:
             # High-fidelity mock responses for RAG chat
-            last_message = messages[-1]["content"] if messages else ""
+            last_message_content = messages[-1]["content"] if messages else ""
+            if isinstance(last_message_content, list):
+                last_message = next((part["text"] for part in last_message_content if part["type"] == "text"), "")
+                has_image = any(part.get("type") == "image_url" for part in last_message_content)
+            else:
+                last_message = last_message_content
+                has_image = False
+                
             if "agentic RAG" in last_message.lower():
                 return "Agentic RAG is a futuristic next-generation RAG architecture where autonomous AI agents use tools and reasoning loops (such as LangGraph) to retrieve, evaluate, and act upon knowledge."
             elif "verify connection" in last_message.lower():
                 return "NVIDIA NIM is online."
+                
+            if has_image:
+                return f"[MOCK NVIDIA NIM meta/llama-3.2-90b-vision-instruct] Analyzed image with query: '{last_message}'"
             return f"[MOCK NVIDIA NIM meta/llama-3.3-70b-instruct] Response to: '{last_message}'"
 
         url = f"{settings.NVIDIA_BASE_URL}/chat/completions"
         selected_model = model or settings.NVIDIA_LLM_MODEL
+        
+        # Switch to vision model if image content is present
+        if messages and isinstance(messages[-1]["content"], list):
+            if any(part.get("type") == "image_url" for part in messages[-1]["content"]):
+                if not model:
+                    selected_model = "meta/llama-3.2-90b-vision-instruct"
 
         payload = {
             "model": selected_model,
