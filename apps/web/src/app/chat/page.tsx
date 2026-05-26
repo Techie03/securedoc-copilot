@@ -694,7 +694,14 @@ export default function ChatPage() {
                         <div className="flex flex-wrap gap-2 mb-3">
                           {msg.images_json.map((imgStr, i) => (
                             <div key={i} className="relative rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm max-w-[250px]">
-                              <img src={imgStr} alt="Attached" className="object-cover w-full h-auto" />
+                              {imgStr.startsWith('data:application/pdf') ? (
+                                <div className="w-[150px] h-[150px] flex flex-col items-center justify-center bg-rose-50 text-rose-500 dark:bg-rose-500/10 dark:text-rose-400">
+                                  <FileText className="h-10 w-10 mb-2" />
+                                  <span className="text-xs font-bold uppercase tracking-wider">PDF Attached</span>
+                                </div>
+                              ) : (
+                                <img src={imgStr} alt="Attached" className="object-cover w-full h-auto" />
+                              )}
                             </div>
                           ))}
                         </div>
@@ -805,7 +812,14 @@ export default function ChatPage() {
               <div className="max-w-3xl mx-auto mb-3 flex flex-wrap gap-3">
                 {selectedImages.map((imgUrl, i) => (
                   <div key={i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm group">
-                    <img src={imgUrl} alt="Preview" className="w-full h-full object-cover" />
+                    {imgUrl.startsWith('data:application/pdf') ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-rose-50 text-rose-500 dark:bg-rose-500/10 dark:text-rose-400">
+                        <FileText className="h-8 w-8 mb-1" />
+                        <span className="text-[10px] font-bold">PDF</span>
+                      </div>
+                    ) : (
+                      <img src={imgUrl} alt="Preview" className="w-full h-full object-cover" />
+                    )}
                     <button
                       onClick={() => removeImage(i)}
                       className="absolute top-1 right-1 p-1 bg-slate-900/60 hover:bg-rose-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
@@ -821,7 +835,7 @@ export default function ChatPage() {
               <input 
                 type="file" 
                 multiple 
-                accept="image/*" 
+                accept="image/*,application/pdf" 
                 className="hidden" 
                 ref={fileInputRef} 
                 onChange={handleImageUpload} 

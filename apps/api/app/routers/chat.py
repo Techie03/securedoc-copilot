@@ -6,6 +6,9 @@ from app.dependencies import get_current_user, get_current_workspace_member
 from app.models.models import ChatSession, ChatMessage, ChatRun, EvaluationScore, User
 from app.schemas.schemas import ChatSessionCreate, ChatSessionResponse, ChatMessageCreate, ChatMessageResponse
 from app.llm.agent import LangGraphAgent
+import base64
+import io
+from pdf2image import convert_from_bytes
 
 router = APIRouter(prefix="/workspaces/{workspace_id}/chats", tags=["Chat"])
 
@@ -106,13 +109,32 @@ async def send_message(
     if not session:
         raise HTTPException(status_code=404, detail="Chat session not found")
         
+    processed_images = None
+    if message_in.images:
+        processed_images = []
+        for img in message_in.images:
+            if img.startswith("data:application/pdf;base64,"):
+                try:
+                    b64_data = img.split(",")[1]
+                    pdf_bytes = base64.b64decode(b64_data)
+                    pages = convert_from_bytes(pdf_bytes)
+                    for page in pages:
+                        img_byte_arr = io.BytesIO()
+                        page.save(img_byte_arr, format='JPEG')
+                        img_b64 = base64.b64encode(img_byte_arr.getvalue()).decode("utf-8")
+                        processed_images.append(f"data:image/jpeg;base64,{img_b64}")
+                except Exception as e:
+                    print(f"Error processing PDF: {e}")
+            else:
+                processed_images.append(img)
+
     # 1. Save user message
     user_message = ChatMessage(
         session_id=session_id,
         role="user",
         content=message_in.content,
         mode=message_in.mode or "auto",
-        images_json=message_in.images
+        images_json=processed_images
     )
     db.add(user_message)
     db.commit()
@@ -144,7 +166,7 @@ async def send_message(
             workspace_id=workspace_id,
             user_id=current_user.id,
             mode=message_in.mode or "auto",
-            images=message_in.images
+            images=processed_images
         )
     except Exception as e:
         db.rollback()
