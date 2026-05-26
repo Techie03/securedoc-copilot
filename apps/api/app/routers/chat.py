@@ -181,6 +181,7 @@ async def send_message(
         role="assistant",
         content=agent_state["response"],
         mode=agent_state["route"],
+        images_json=agent_state.get("images"),
         sources_json=agent_state["citations"]
     )
     db.add(assistant_message)

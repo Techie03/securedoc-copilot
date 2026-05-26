@@ -73,6 +73,42 @@ class NvidiaNIMClient:
 
         return data["choices"][0]["message"]["content"]
 
+    async def generate_image(self, prompt: str) -> str:
+        """
+        Calls NVIDIA NIM image generation endpoint (or mocks it).
+        Returns a base64 string of the generated image.
+        """
+        if self.mock:
+            # Return a mock placeholder image (a simple red 1x1 pixel for testing, or a realistic URL)
+            # A realistic placeholder image from unsplash:
+            return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            
+        url = "https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl-base-1.0"
+        payload = {
+            "text_prompts": [{"text": prompt}],
+            "cfg_scale": 7,
+            "steps": 30,
+            "seed": 0
+        }
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    url,
+                    json=payload,
+                    headers=self.headers,
+                    timeout=60.0
+                )
+                response.raise_for_status()
+                data = response.json()
+                if "artifacts" in data and len(data["artifacts"]) > 0:
+                    base64_str = data["artifacts"][0]["base64"]
+                    return f"data:image/png;base64,{base64_str}"
+                return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3"
+        except Exception as e:
+            print(f"NVIDIA NIM Image Generation error: {e}")
+            return "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3"
+
     async def embed_texts(
         self,
         texts: List[str],

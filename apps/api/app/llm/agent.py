@@ -92,8 +92,10 @@ async def intent_router_node(state: AgentState) -> Dict[str, Any]:
         "5. table - Inquiries requiring tabular analysis, structured CSV grids, data sorting, or markdown spreadsheets.\n"
         "6. memory - User requests to review, remember, forget, clear, or configure user settings and preferences.\n"
         "7. report - Request to draft a comprehensive report, technical whitepaper, summary writeup, or long document.\n"
-        "8. general - General knowledge queries, social greeting (chitchat), jokes, and standard assistant tasks.\n\n"
-        "Output ONLY the category name in lowercase: 'rag', 'coding', 'summary', 'compare', 'table', 'memory', 'report', or 'general'. "
+        "8. web_search - Request to search the live internet for recent news, stock prices, or current events.\n"
+        "9. image_generation - Request to generate, draw, or create a visual chart, diagram, or image.\n"
+        "10. general - General knowledge queries, social greeting (chitchat), jokes, and standard assistant tasks.\n\n"
+        "Output ONLY the category name in lowercase: 'rag', 'coding', 'summary', 'compare', 'table', 'memory', 'report', 'web_search', 'image_generation', or 'general'. "
         "Do not include explanation, punctuation, or multiple words."
     )
     
@@ -106,7 +108,7 @@ async def intent_router_node(state: AgentState) -> Dict[str, Any]:
         route = await client.chat(messages=messages, temperature=0.0, max_tokens=10)
         route_clean = route.strip().lower()
         # Fallback security check
-        valid_routes = ["rag", "coding", "summary", "compare", "table", "memory", "report", "general"]
+        valid_routes = ["rag", "coding", "summary", "compare", "table", "memory", "report", "web_search", "image_generation", "general"]
         for r in valid_routes:
             if r in route_clean:
                 return {"route": r}
@@ -197,6 +199,56 @@ async def retriever_node(state: AgentState) -> Dict[str, Any]:
         
         return {"context": context}
 
+async def web_search_node(state: AgentState) -> Dict[str, Any]:
+    """
+    Node for Live Web Search using duckduckgo-search.
+    """
+    query = state["query"]
+    context = state["context"]
+    try:
+        from duckduckgo_search import DDGS
+        results = []
+        with DDGS() as ddgs:
+            # Get top 3 search results
+            for r in ddgs.text(query, max_results=3):
+                results.append(
+                    f"Title: {r.get('title')}\n"
+                    f"Link: {r.get('href')}\n"
+                    f"Snippet: {r.get('body')}"
+                )
+        if results:
+            search_str = "LIVE WEB SEARCH RESULTS:\n" + "\n\n".join(results)
+            context.append({
+                "content": search_str,
+                "filename": "duckduckgo_search",
+                "document_id": "web",
+                "page_number": 1,
+                "relevance_score": 1.0
+            })
+    except Exception as e:
+        logger.error(f"Web search failed: {e}")
+        
+    return {"context": context}
+
+async def image_generation_node(state: AgentState) -> Dict[str, Any]:
+    """
+    Node for generating images.
+    """
+    query = state["query"]
+    images = state.get("images") or []
+    client = NvidiaNIMClient()
+    
+    try:
+        # We can extract the core prompt for image gen
+        prompt_response = await client.chat([{"role": "user", "content": f"Extract the core image generation prompt from this request: '{query}'. Output ONLY the prompt."}], max_tokens=50)
+        img_prompt = prompt_response.strip()
+        
+        b64_image = await client.generate_image(img_prompt)
+        images.append(b64_image)
+    except Exception as e:
+        logger.error(f"Image generation failed: {e}")
+        
+    return {"images": images}
 
 async def generator_node(state: AgentState) -> Dict[str, Any]:
     """
@@ -234,6 +286,19 @@ async def generator_node(state: AgentState) -> Dict[str, Any]:
         system_instructions.append(
             "\nYou are operating in CODING ASSISTANT mode. Provide clean, secure, and production-ready code blocks.\n"
             "Include comments, syntax highlights, and point out any security/concurrency gotchas."
+        )
+    elif route == "memory":
+        system_instructions.append(
+            "\nYou are operating in MEMORY mode. Acknowledge what you have been asked to remember or forget based on the query."
+        )
+    elif route == "web_search":
+        system_instructions.append(
+            "\nYou are operating in WEB SEARCH mode. Base your answer strictly on the live internet search results provided below.\n"
+            "Cite the search results in your answer."
+        )
+    elif route == "image_generation":
+        system_instructions.append(
+            "\nYou are operating in IMAGE GENERATION mode. Acknowledge that you have successfully generated the requested image."
         )
     elif route == "summary":
         system_instructions.append(
@@ -506,9 +571,16 @@ class LangGraphAgent:
         intent = await intent_router_node(state)
         state.update(intent)
         
-        # 3. Document Retrieval
-        context_data = await retriever_node(state)
-        state.update(context_data)
+        # 3. Retrieval / Tools
+        if state["route"] == "web_search":
+            search_data = await web_search_node(state)
+            state.update(search_data)
+        elif state["route"] == "image_generation":
+            img_data = await image_generation_node(state)
+            state.update(img_data)
+        else:
+            context_data = await retriever_node(state)
+            state.update(context_data)
         
         # 4. Generate Answer
         generation = await generator_node(state)
