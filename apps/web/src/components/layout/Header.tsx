@@ -145,7 +145,7 @@ export default function Header() {
 
             {/* Workspace Selector (Only when logged in) */}
             {mounted && user && (
-              <div className="relative" ref={workspaceRef}>
+              <div className="relative flex items-center gap-1" ref={workspaceRef}>
                 <motion.button
                   onClick={() => setShowWorkspaceMenu(!showWorkspaceMenu)}
                   whileHover={{ y: -1 }}
@@ -157,6 +157,16 @@ export default function Header() {
                   </span>
                   <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${showWorkspaceMenu ? 'rotate-180' : ''}`} />
                 </motion.button>
+                
+                {currentWorkspace && (
+                  <button
+                    onClick={(e) => handleDeleteWorkspace(e, currentWorkspace.id)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
+                    title="Delete Current Workspace"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
 
                 <AnimatePresence>
                   {showWorkspaceMenu && (
@@ -189,7 +199,7 @@ export default function Header() {
                             </button>
                             <button
                               onClick={(e) => handleDeleteWorkspace(e, ws.id)}
-                              className="opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-rose-500 transition-all cursor-pointer"
+                              className="p-2 text-slate-400 hover:text-rose-500 transition-all cursor-pointer"
                               title="Delete Workspace"
                             >
                               <Trash2 className="h-3 w-3" />
