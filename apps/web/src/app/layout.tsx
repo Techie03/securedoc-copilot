@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SecureDoc Copilot: NVIDIA NIM-Powered Agentic RAG Platform",
   description: "SecureDoc Copilot is a secure, multi-user, NVIDIA NIM-powered agentic RAG platform that searches, reasons, remembers, evaluates, and acts across private documents, code, and enterprise knowledge.",
+  verification: {
+    google: "JaFA266Xj2NtcvzKItgK0CpLX7Ff86n5GZLpI5CYdJQ",
+  },
   icons: {
     icon: [
       { url: '/favicon.ico' },
