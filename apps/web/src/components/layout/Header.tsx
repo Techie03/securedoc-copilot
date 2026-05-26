@@ -175,7 +175,7 @@ export default function Header() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute left-0 mt-2 w-64 origin-top-left rounded-2xl border border-slate-200/50 bg-white/90 backdrop-blur-md p-2 shadow-xl dark:border-white/10 dark:bg-slate-900"
+                      className="absolute left-0 top-full mt-2 w-64 origin-top-left rounded-2xl border border-slate-200/50 bg-white/90 backdrop-blur-md p-2 shadow-xl dark:border-white/10 dark:bg-slate-900 z-50"
                     >
                       <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         Workspaces
