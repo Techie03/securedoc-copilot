@@ -32,7 +32,9 @@ import {
   X,
   Mic,
   ArrowLeftRight,
-  ImageIcon
+  ImageIcon,
+  Video,
+  ExternalLink
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
@@ -227,6 +229,13 @@ export default function ChatPage() {
       return (
         <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
           CSV
+        </div>
+      );
+    }
+    if (type === 'YOUTUBE') {
+      return (
+        <div className="h-8 w-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-600 dark:text-red-400 border border-red-500/20 shrink-0">
+          <Video className="h-4 w-4" />
         </div>
       );
     }
@@ -1016,9 +1025,16 @@ export default function ChatPage() {
                           <p className="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[150px]" title={doc.filename}>
                             {doc.filename}
                           </p>
-                          <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
-                            Size: {getMockFileSize(doc.filename, doc.id)}
-                          </p>
+                          {doc.file_type === 'YOUTUBE' ? (
+                            <a href={doc.storage_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[10px] text-red-500 hover:text-red-600 mt-0.5 font-medium transition-colors">
+                              <ExternalLink className="h-2.5 w-2.5" />
+                              Watch Source
+                            </a>
+                          ) : (
+                            <p className="text-[10px] text-slate-500 mt-0.5 font-medium">
+                              Size: {getMockFileSize(doc.filename, doc.id)}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="shrink-0 flex items-center gap-1">

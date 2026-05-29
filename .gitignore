@@ -37,3 +37,5 @@ docker-compose.override.yml
 # Temp Hugging Face repository clone
 hf_repo_temp/
 
+
+.vercel

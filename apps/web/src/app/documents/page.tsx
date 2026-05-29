@@ -19,7 +19,8 @@ import {
   Info,
   FolderOpen,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Video
 } from 'lucide-react';
 
 export default function DocumentLibrary() {
@@ -40,6 +41,10 @@ export default function DocumentLibrary() {
   // Delete confirm state
   const [deleteTarget, setDeleteTarget] = useState<DocumentResponse | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // YouTube Ingestion State
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeLoading, setYoutubeLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -158,6 +163,25 @@ export default function DocumentLibrary() {
     }
   };
 
+  // YouTube Upload handler
+  const handleYoutubeIngest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentWorkspace || !youtubeUrl.trim()) return;
+    
+    setYoutubeLoading(true);
+    setError(null);
+    try {
+      await api.syncYoutubeConnector(currentWorkspace.id, youtubeUrl);
+      setYoutubeUrl('');
+      fetchDocuments();
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || err.detail || 'YouTube ingestion failed.');
+    } finally {
+      setYoutubeLoading(false);
+    }
+  };
+
   // Delete handler
   const handleDeleteDocument = async () => {
     if (!currentWorkspace || !deleteTarget) return;
@@ -180,6 +204,7 @@ export default function DocumentLibrary() {
     if (type === 'PDF') return <span className="text-rose-500 font-bold">PDF</span>;
     if (type === 'DOCX' || type === 'DOC') return <span className="text-blue-400 font-bold">DOC</span>;
     if (type === 'CSV' || type === 'XLSX') return <span className="text-emerald-500 font-bold">CSV</span>;
+    if (type === 'YOUTUBE') return <span className="text-red-600 font-bold">YOUTUBE</span>;
     return <span className="text-slate-400 font-bold">TXT</span>;
   };
 
@@ -447,7 +472,7 @@ export default function DocumentLibrary() {
                   </div>
                 )}
 
-                <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-4 backdrop-blur-md text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                    <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-4 backdrop-blur-md text-xs text-slate-600 dark:text-slate-400 space-y-2">
                   <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
                     <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     <span>NVIDIA NIM Indexer Pipeline</span>
@@ -459,6 +484,39 @@ export default function DocumentLibrary() {
                     Models in use: <strong>nvidia/nv-embedqa-e5-v5</strong>
                   </p>
                 </div>
+
+                {/* YouTube Ingestor Block */}
+                <div className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/30 p-4 backdrop-blur-md space-y-3 flex flex-col transition-all duration-300">
+                  <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+                    <Video className="h-4 w-4 text-red-600" />
+                    <span>YouTube Ingestor</span>
+                  </div>
+                  <form onSubmit={handleYoutubeIngest} className="flex flex-col gap-3">
+                    <input
+                      type="text"
+                      placeholder="Paste YouTube URL here..."
+                      value={youtubeUrl}
+                      onChange={(e) => setYoutubeUrl(e.target.value)}
+                      className="block w-full rounded-xl border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-slate-900/30 py-2.5 px-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none ring-1 ring-transparent transition-all focus:border-red-500 focus:ring-red-500/30"
+                      disabled={youtubeLoading}
+                    />
+                    <button
+                      type="submit"
+                      disabled={!youtubeUrl.trim() || youtubeLoading}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:shadow-red-500/10 cursor-pointer transition-all duration-300 disabled:opacity-50"
+                    >
+                      {youtubeLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Video className="h-4 w-4" />
+                          <span>Ingest Video</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
               </div>
 
               {/* Right Column: Files List Table */}

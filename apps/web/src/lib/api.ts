@@ -340,6 +340,13 @@ export const api = {
     });
   },
   
+  async syncYoutubeConnector(workspaceId: string, youtubeUrl: string): Promise<{ detail: string, document_id: string }> {
+    return request<{ detail: string, document_id: string }>(`/workspaces/${workspaceId}/connectors/youtube/sync`, {
+      method: 'POST',
+      body: JSON.stringify({ youtube_url: youtubeUrl }),
+    });
+  },
+  
   // Document API
   async uploadDocument(workspaceId: string, file: File): Promise<DocumentResponse> {
     const formData = new FormData();

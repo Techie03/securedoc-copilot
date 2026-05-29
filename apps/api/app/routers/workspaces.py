@@ -7,7 +7,8 @@ from app.database import get_db
 from app.crud import crud
 from app.schemas.schemas import (
     WorkspaceCreate, WorkspaceResponse, WorkspaceDetailResponse,
-    WorkspaceMemberAdd, WorkspaceMemberResponse, GitHubSyncRequest
+    WorkspaceMemberAdd, WorkspaceMemberResponse, GitHubSyncRequest,
+    YouTubeSyncRequest
 )
 from app.dependencies import get_current_user, get_current_workspace_member
 from app.models.models import User, KnowledgeGraphTriple, Document
@@ -366,3 +367,49 @@ async def sync_github_connector(
     background_tasks.add_task(process_github_doc_inline, doc_id, workspace_id, readme_content)
     
     return {"detail": "GitHub repository synced successfully.", "document_id": doc_id}
+
+@router.post("/{workspace_id}/connectors/youtube/sync")
+async def sync_youtube_connector(
+    workspace_id: str,
+    request: YouTubeSyncRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Syncs a YouTube video link by adding it as a Document.
+    """
+    get_current_workspace_member(workspace_id=workspace_id, db=db, current_user=current_user)
+
+    youtube_url = request.youtube_url.strip()
+    if not (youtube_url.startswith("https://www.youtube.com/") or youtube_url.startswith("https://youtu.be/")):
+        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+
+    # Create a mocked document record
+    doc_id = str(uuid.uuid4())
+    
+    # Try to extract a video ID or simple name
+    if "v=" in youtube_url:
+        video_id = youtube_url.split("v=")[1].split("&")[0]
+        filename = f"YouTube_Video_{video_id}"
+    elif "youtu.be/" in youtube_url:
+        video_id = youtube_url.split("youtu.be/")[1].split("?")[0]
+        filename = f"YouTube_Video_{video_id}"
+    else:
+        filename = "YouTube_Video"
+    
+    new_doc = Document(
+        id=doc_id,
+        workspace_id=workspace_id,
+        uploaded_by=current_user.id,
+        filename=filename,
+        file_type="YOUTUBE",
+        storage_url=youtube_url,
+        status="ready",
+        version=1
+    )
+    db.add(new_doc)
+    db.commit()
+    db.refresh(new_doc)
+
+    return {"detail": "YouTube video link synced successfully.", "document_id": doc_id}

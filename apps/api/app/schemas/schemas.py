@@ -223,4 +223,5 @@ class MemoryResponse(BaseModel):
 class GitHubSyncRequest(BaseModel):
     repo_url: str
 
-
+class YouTubeSyncRequest(BaseModel):
+    youtube_url: str
