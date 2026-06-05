@@ -34,7 +34,9 @@ import {
   ArrowLeftRight,
   ImageIcon,
   Video,
-  ExternalLink
+  ExternalLink,
+  UploadCloud,
+  Sliders
 } from 'lucide-react';
 
 const MODE_CONFIGS = [
@@ -86,6 +88,60 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const sidebarFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Advanced settings and uploader states
+  const [multiDoc, setMultiDoc] = useState(false);
+  const [thinkingMode, setThinkingMode] = useState(false);
+  const [leftSidebarTab, setLeftSidebarTab] = useState<'sessions' | 'engine'>('engine');
+  
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleStageFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleStageFiles = async (files: FileList) => {
+    if (!currentWorkspace?.id) return;
+    setUploading(true);
+    setUploadProgress(10);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        setUploadProgress(30 + (i / files.length) * 45);
+        await api.uploadDocument(currentWorkspace.id, file);
+      }
+      setUploadProgress(100);
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+        loadDocuments();
+      }, 500);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload document: " + (err instanceof Error ? err.message : String(err)));
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -386,7 +442,9 @@ export default function ChatPage() {
         activeSession.id, 
         userText || "Analyze this image.", 
         selectedMode, 
-        imagesToSend.length > 0 ? imagesToSend : undefined
+        imagesToSend.length > 0 ? imagesToSend : undefined,
+        multiDoc,
+        thinkingMode
       );
       
       // 3. Update message list with final user and assistant messages
@@ -482,7 +540,9 @@ export default function ChatPage() {
       }`}>
         {/* Mobile Header for Sidebar Drawer */}
         <div className="p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between lg:hidden shrink-0">
-          <span className="font-bold text-xs text-slate-500 uppercase tracking-wider">Chat History</span>
+          <span className="font-bold text-xs text-slate-500 uppercase tracking-wider">
+            {leftSidebarTab === 'engine' ? 'Engine & Docs' : 'Chat History'}
+          </span>
           <button
             onClick={() => setMobileSessionsOpen(false)}
             className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer"
@@ -491,57 +551,238 @@ export default function ChatPage() {
           </button>
         </div>
 
-        <div className="p-4 border-b border-gray-200 dark:border-white/5 shrink-0">
-          <button
-            onClick={() => {
-              handleCreateSession();
-              setMobileSessionsOpen(false); // Auto-close drawer on selection
-            }}
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 py-3 text-sm font-semibold text-white shadow-md shadow-violet-500/10 hover:shadow-cyan-500/25 transition-all duration-300 cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Chat Session</span>
-          </button>
+        {/* Tab Switcher */}
+        <div className="p-3 border-b border-gray-200 dark:border-white/5 bg-slate-100/50 dark:bg-slate-950/20 shrink-0">
+          <div className="flex gap-1 bg-slate-200/50 dark:bg-slate-950/40 p-1 rounded-xl border border-gray-200 dark:border-white/5">
+            <button
+              type="button"
+              onClick={() => setLeftSidebarTab('engine')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+                leftSidebarTab === 'engine'
+                  ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-white/10 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              <Database className="h-3.5 w-3.5 text-cyan-505 dark:text-cyan-400 shrink-0" />
+              <span>Engine & Docs</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setLeftSidebarTab('sessions')}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer ${
+                leftSidebarTab === 'sessions'
+                  ? 'bg-white dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-white/10 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              <MessageSquare className="h-3.5 w-3.5 text-cyan-505 dark:text-cyan-400 shrink-0" />
+              <span>History</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {sessionsLoading ? (
-            <div className="flex flex-col items-center justify-center py-10 space-y-2">
-              <Loader2 className="h-5 w-5 animate-spin text-slate-500" />
-              <span className="text-xs text-slate-500">Loading history...</span>
-            </div>
-          ) : sessions.length === 0 ? (
-            <div className="text-center py-10 text-xs text-slate-500">
-              No sessions found. Start a new chat!
-            </div>
-          ) : (
-            sessions.map((s) => (
+        {leftSidebarTab === 'engine' ? (
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {/* Direct drop uploader */}
+            <div className="flex flex-col">
+              <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Database className="h-3.5 w-3.5" />
+                <span>Documents</span>
+              </div>
               <div
-                key={s.id}
-                onClick={() => {
-                  setActiveSession(s);
-                  setMobileSessionsOpen(false); // Auto-close drawer on selection
-                }}
-                className={`group flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-300 ${
-                  activeSession?.id === s.id
-                    ? 'bg-slate-100 dark:bg-white/5 border-cyan-500/30 dark:border-cyan-500/30 text-slate-900 dark:text-white font-semibold'
-                    : 'bg-transparent border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5/40 hover:text-slate-800 dark:hover:text-slate-200'
+                onDragEnter={handleDrag}
+                onDragOver={handleDrag}
+                onDragLeave={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => sidebarFileInputRef.current?.click()}
+                className={`relative border border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[120px] bg-slate-50/50 dark:bg-slate-900/10 hover:bg-slate-100/50 dark:hover:bg-slate-900/30 ${
+                  dragActive 
+                    ? 'border-blue-500 bg-blue-500/5 dark:bg-blue-500/5 shadow-md shadow-blue-500/10 scale-[0.98]' 
+                    : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
                 }`}
               >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <MessageSquare className={`h-4 w-4 shrink-0 ${activeSession?.id === s.id ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-500'}`} />
-                  <span className="text-sm font-medium truncate">{s.title}</span>
-                </div>
-                <button
-                  onClick={(e) => handleDeleteSession(e, s.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-rose-500 rounded transition-all cursor-pointer"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                <input
+                  type="file"
+                  ref={sidebarFileInputRef}
+                  multiple
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleStageFiles(e.target.files);
+                    }
+                  }}
+                  className="hidden"
+                  accept=".pdf,.docx,.doc,.csv,.xlsx,.txt,.md,.png,.jpg,.jpeg,.html,.htm"
+                />
+                {uploading ? (
+                  <div className="w-full flex flex-col items-center">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-500 mb-2" />
+                    <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Uploading...</span>
+                    <div className="mt-2 w-full h-1 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-500 transition-all duration-100" style={{ width: `${uploadProgress}%` }} />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="h-9 w-9 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 flex items-center justify-center mb-2 text-slate-400">
+                      <UploadCloud className="h-5 w-5" />
+                    </div>
+                    <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200">Drag & drop files here</p>
+                    <p className="text-[9px] text-slate-500 mt-0.5 font-medium">PDF, TXT, PNG, JPG, HTML, MD</p>
+                    <button 
+                      type="button"
+                      className="mt-3 px-4 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 border border-blue-600/30 dark:border-blue-400/30 rounded-lg hover:bg-blue-500/5 transition-all"
+                    >
+                      Browse
+                    </button>
+                  </>
+                )}
               </div>
-            ))
-          )}
-        </div>
+            </div>
+
+            {/* ENGINE MODE */}
+            <div className="flex flex-col gap-3">
+              <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Sliders className="h-3.5 w-3.5" />
+                <span>Engine Mode</span>
+              </div>
+              
+              {/* Multi-Document Agent toggle */}
+              <div className="flex items-start justify-between p-3 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/10">
+                <div className="flex flex-col pr-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Multi-Document Agent</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    Each uploaded file gets its own agent. Best for cross-doc reasoning.
+                  </span>
+                </div>
+                <div className="flex items-center pt-0.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setMultiDoc(!multiDoc)}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      multiDoc ? 'bg-cyan-600 dark:bg-cyan-500' : 'bg-slate-200 dark:bg-slate-800'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        multiDoc ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Thinking Mode (ReAct) toggle */}
+              <div className="flex items-start justify-between p-3 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/10">
+                <div className="flex flex-col pr-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Thinking Mode (ReAct)</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    Step-by-step tool reasoning. Shows every thought and action.
+                  </span>
+                </div>
+                <div className="flex items-center pt-0.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setThinkingMode(!thinkingMode)}
+                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      thinkingMode ? 'bg-cyan-600 dark:bg-cyan-500' : 'bg-slate-200 dark:bg-slate-800'
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        thinkingMode ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* ENGINE GUIDE */}
+            <div className="flex flex-col gap-3">
+              <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Info className="h-3.5 w-3.5" />
+                <span>Engine Guide</span>
+              </div>
+              <div className="flex flex-col gap-2.5 px-0.5">
+                {[
+                  { label: "Basic RAG", desc: "Simple factual lookup", color: "bg-blue-600 text-white" },
+                  { label: "Router Engine", desc: "Summary vs search", color: "bg-emerald-600 text-white" },
+                  { label: "Sub-Question", desc: "Multi-doc compare", color: "bg-cyan-600 text-white" },
+                  { label: "Multi-Doc Agent", desc: "Per-file agents", color: "bg-purple-600 text-white" },
+                  { label: "Multi-Modal", desc: "Image analysis", color: "bg-orange-500 text-white" },
+                  { label: "ReAct Agent", desc: "Tool reasoning", color: "bg-rose-600 text-white" }
+                ].map((guide, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-[11px]">
+                    <span className={`px-2 py-0.5 rounded-md font-bold text-[9px] min-w-[95px] text-center shadow-sm ${guide.color}`}>
+                      {guide.label}
+                    </span>
+                    <span className="text-slate-500 dark:text-slate-400 font-semibold text-right pr-0.5">
+                      {guide.desc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="p-4 border-b border-gray-200 dark:border-white/5 shrink-0">
+              <button
+                onClick={() => {
+                  handleCreateSession();
+                  setMobileSessionsOpen(false); // Auto-close drawer on selection
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-600 py-3 text-sm font-semibold text-white shadow-md shadow-violet-500/10 hover:shadow-cyan-500/25 transition-all duration-300 cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                <span>New Chat Session</span>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {sessionsLoading ? (
+                <div className="flex flex-col items-center justify-center py-10 space-y-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-slate-500" />
+                  <span className="text-xs text-slate-500">Loading history...</span>
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="text-center py-10 text-xs text-slate-500">
+                  No sessions found. Start a new chat!
+                </div>
+              ) : (
+                sessions.map((s) => (
+                  <div
+                    key={s.id}
+                    onClick={() => {
+                      setActiveSession(s);
+                      setMobileSessionsOpen(false); // Auto-close drawer on selection
+                    }}
+                    className={`group flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-all duration-300 ${
+                      activeSession?.id === s.id
+                        ? 'bg-slate-100 dark:bg-white/5 border-cyan-500/30 dark:border-cyan-500/30 text-slate-900 dark:text-white font-semibold'
+                        : 'bg-transparent border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5/40 hover:text-slate-800 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <MessageSquare className={`h-4 w-4 shrink-0 ${activeSession?.id === s.id ? 'text-cyan-500 dark:text-cyan-400' : 'text-slate-500'}`} />
+                      <span className="text-sm font-medium truncate">{s.title}</span>
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteSession(e, s.id)}
+                      className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-rose-500 rounded transition-all cursor-pointer"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 2. MAIN CHAT THREAD */}

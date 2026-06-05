@@ -166,7 +166,9 @@ async def send_message(
             workspace_id=workspace_id,
             user_id=current_user.id,
             mode=message_in.mode or "auto",
-            images=processed_images
+            images=processed_images,
+            multi_doc=message_in.multi_doc,
+            thinking_mode=message_in.thinking_mode
         )
     except Exception as e:
         db.rollback()

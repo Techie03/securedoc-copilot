@@ -5,6 +5,8 @@ import pypdf
 import docx
 from pdf2image import convert_from_bytes
 import pytesseract
+from PIL import Image
+from html.parser import HTMLParser
 
 def split_text_recursive(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[str]:
     """
@@ -237,6 +239,76 @@ def parse_txt(file_bytes: bytes) -> List[Dict[str, Any]]:
         raise ValueError(f"Failed to parse text document: {str(e)}")
 
 
+class HTMLTextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.result = []
+        self.ignore_tags = {"script", "style", "head", "meta", "link"}
+        self.current_tag = ""
+
+    def handle_starttag(self, tag, attrs):
+        self.current_tag = tag.lower()
+
+    def handle_endtag(self, tag):
+        self.current_tag = ""
+
+    def handle_data(self, data):
+        if self.current_tag not in self.ignore_tags:
+            text = data.strip()
+            if text:
+                self.result.append(text)
+
+    def get_text(self):
+        return "\n".join(self.result)
+
+
+def parse_html(file_bytes: bytes) -> List[Dict[str, Any]]:
+    """
+    Parses an HTML file, extracting body text and striping tags.
+    """
+    try:
+        html_content = file_bytes.decode("utf-8", errors="ignore")
+        extractor = HTMLTextExtractor()
+        extractor.feed(html_content)
+        text = extractor.get_text()
+        text_chunks = split_text_recursive(text, chunk_size=1000, chunk_overlap=200)
+        return [
+            {
+                "content": chunk_text,
+                "page_number": 1,
+                "token_count": len(chunk_text) // 4
+            }
+            for chunk_text in text_chunks
+        ]
+    except Exception as e:
+        print(f"Error parsing HTML: {e}")
+        raise ValueError(f"Failed to parse HTML document: {str(e)}")
+
+
+def parse_image(file_bytes: bytes) -> List[Dict[str, Any]]:
+    """
+    Parses an image file (PNG/JPG) using Tesseract OCR.
+    """
+    try:
+        image = Image.open(io.BytesIO(file_bytes))
+        text = pytesseract.image_to_string(image)
+        if not text or len(text.strip()) < 5:
+            text = "[Image document processed. No OCR text could be extracted.]"
+            
+        text_chunks = split_text_recursive(text, chunk_size=1000, chunk_overlap=200)
+        return [
+            {
+                "content": chunk_text,
+                "page_number": 1,
+                "token_count": len(chunk_text) // 4
+            }
+            for chunk_text in text_chunks
+        ]
+    except Exception as e:
+        print(f"Error parsing image: {e}")
+        raise ValueError(f"Failed to parse Image document: {str(e)}")
+
+
 def parse_document(file_bytes: bytes, filename: str) -> List[Dict[str, Any]]:
     """
     Routes parsing based on the file extension.
@@ -250,6 +322,10 @@ def parse_document(file_bytes: bytes, filename: str) -> List[Dict[str, Any]]:
     elif ext in ["csv", "xlsx"]:
         # Excel can be exported/parsed as CSV for this stage
         return parse_csv(file_bytes)
+    elif ext in ["png", "jpg", "jpeg"]:
+        return parse_image(file_bytes)
+    elif ext in ["html", "htm"]:
+        return parse_html(file_bytes)
     else:
         # Default to plain text parser for txt, md, log, json, etc.
         return parse_txt(file_bytes)

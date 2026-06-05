@@ -27,6 +27,8 @@ class AgentState(TypedDict):
     eval_scores: Dict[str, float]
     token_usage: Dict[str, int]
     latency_ms: int
+    multi_doc: Optional[bool]
+    thinking_mode: Optional[bool]
 
 async def load_memories_node(state: AgentState) -> Dict[str, Any]:
     """
@@ -262,6 +264,37 @@ async def generator_node(state: AgentState) -> Dict[str, Any]:
     
     client = NvidiaNIMClient()
     
+    # 1. Multi-Document Sub-Agent Summaries
+    multi_doc_summary = ""
+    if state.get("multi_doc") and context:
+        docs_chunks = {}
+        for doc in context:
+            fname = doc["filename"]
+            if fname not in docs_chunks:
+                docs_chunks[fname] = []
+            docs_chunks[fname].append(doc["content"])
+        
+        agent_summaries = []
+        for fname, chunks in docs_chunks.items():
+            doc_context_text = "\n".join(chunks)
+            doc_agent_prompt = [
+                {"role": "system", "content": f"You are the sub-agent for document: '{fname}'. Your job is to analyze your document's contents and summarize parts relevant to the user query: '{query}'."},
+                {"role": "user", "content": f"Document context:\n{doc_context_text[:3000]}\n\nUser Query: {query}\n\nProvide a concise 1-2 sentence analysis/summary from your document:"}
+            ]
+            try:
+                summary_resp = await client.chat(messages=doc_agent_prompt, temperature=0.2, max_tokens=150)
+                agent_summaries.append(f"* **Agent [{fname}]**: {summary_resp.strip()}")
+            except Exception as e:
+                logger.error(f"Doc sub-agent failed for {fname}: {e}")
+                agent_summaries.append(f"* **Agent [{fname}]**: [Offline or failed to summarize context]")
+
+        multi_doc_summary = (
+            "### 📂 Multi-Document Agent Analysis\n"
+            "Each document has been assigned its own analysis agent to perform cross-doc reasoning:\n\n"
+            + "\n".join(agent_summaries)
+            + "\n\n"
+        )
+    
     # Build System Prompt based on Mode Route
     system_instructions = [
         "You are SecureDoc Copilot, a futuristic next-generation AI assistant.",
@@ -329,6 +362,13 @@ async def generator_node(state: AgentState) -> Dict[str, Any]:
             "\nYou are operating in GENERAL CHAT mode. Engage with the user warmly, answer their questions, and write code/prose as requested."
         )
         
+    # Ground the main model in Multi-Doc Agent summaries if available
+    if multi_doc_summary:
+        system_instructions.append(
+            f"\nHere is the initial analysis summary from each individual document's sub-agent:\n{multi_doc_summary}\n"
+            "Synthesize and compare these sub-agent analyses in your final consolidated response."
+        )
+
     # Build Context Text
     context_str = ""
     if context:
@@ -382,6 +422,44 @@ async def generator_node(state: AgentState) -> Dict[str, Any]:
                 "document_id": doc["document_id"],
                 "page_number": doc.get("page_number")
             })
+
+    # Prepend multi-doc summaries to final output
+    if multi_doc_summary:
+        response = multi_doc_summary + "### 🧠 Combined Cross-Document Reasoning\n" + response
+
+    # 2. Thinking Mode (ReAct) Alert Block Generation
+    if state.get("thinking_mode"):
+        num_docs = len(context) if context else 0
+        doc_names = list(set([doc["filename"] for doc in context])) if context else []
+        doc_list_str = ", ".join(doc_names) if doc_names else "None"
+        
+        thinking_block = (
+            "> [!NOTE]\n"
+            "> ### 🧠 ReAct Thinking Process\n"
+            f"> * **Thought**: User query received: \"{query}\". Analyzing intent routing.\n"
+            f"> * **Action**: Router Engine classified query to path: `{route.upper()}`.\n"
+        )
+        if context:
+            thinking_block += (
+                f"> * **Thought**: Document retrieval required. Querying Qdrant & BM25 indices.\n"
+                f"> * **Action**: Retrieved {num_docs} context chunks from {len(doc_names)} documents: ({doc_list_str}).\n"
+            )
+        else:
+            thinking_block += (
+                "> * **Thought**: Query does not require document retrieval or no documents found. Processing with general knowledge.\n"
+            )
+            
+        if memories:
+            thinking_block += (
+                f"> * **Thought**: Retrieved {len(memories)} active memory contexts from workspace. Applying preferences.\n"
+            )
+            
+        thinking_block += (
+            "> * **Thought**: Synthesizing facts and generating step-by-step grounded response.\n"
+            "> * **Action**: Render final output.\n\n"
+        )
+        
+        response = thinking_block + response
             
     return {
         "response": response,
@@ -535,7 +613,9 @@ class LangGraphAgent:
         workspace_id: str,
         user_id: str,
         mode: str = "auto",
-        images: Optional[List[str]] = None
+        images: Optional[List[str]] = None,
+        multi_doc: bool = False,
+        thinking_mode: bool = False
     ) -> Dict[str, Any]:
         """
         Executes the cyclical workflow manually (simulating LangGraph orchestration)
@@ -560,7 +640,9 @@ class LangGraphAgent:
             "new_memories_extracted": [],
             "eval_scores": {},
             "token_usage": {"prompt_tokens": 0, "completion_tokens": 0},
-            "latency_ms": 0
+            "latency_ms": 0,
+            "multi_doc": multi_doc,
+            "thinking_mode": thinking_mode
         }
         
         # 1. Load Memory Context

@@ -400,10 +400,24 @@ export const api = {
     });
   },
 
-  async sendChatMessage(workspaceId: string, sessionId: string, content: string, mode: string = 'auto', images?: string[]): Promise<ChatMessage> {
+  async sendChatMessage(
+    workspaceId: string, 
+    sessionId: string, 
+    content: string, 
+    mode: string = 'auto', 
+    images?: string[], 
+    multiDoc: boolean = false, 
+    thinkingMode: boolean = false
+  ): Promise<ChatMessage> {
     return request<ChatMessage>(`/workspaces/${workspaceId}/chats/${sessionId}/messages`, {
       method: 'POST',
-      body: JSON.stringify({ content, mode, images }),
+      body: JSON.stringify({ 
+        content, 
+        mode, 
+        images,
+        multi_doc: multiDoc,
+        thinking_mode: thinkingMode
+      }),
     });
   },
 

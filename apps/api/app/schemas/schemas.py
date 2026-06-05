@@ -160,6 +160,8 @@ class ChatMessageCreate(BaseModel):
     content: str
     mode: Optional[str] = "auto" # auto, rag, general, coding, summary, compare, table, memory, report
     images: Optional[List[str]] = None # List of Base64 encoded images
+    multi_doc: Optional[bool] = False
+    thinking_mode: Optional[bool] = False
 
 class ChatRunResponse(BaseModel):
     id: str
